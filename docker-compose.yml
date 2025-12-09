@@ -14,6 +14,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
     restart: unless-stopped
     networks:
       - app-network

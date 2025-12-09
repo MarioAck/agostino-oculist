@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface Item {
@@ -19,6 +20,9 @@ export default function AdminPage() {
   const [saleItems, setSaleItems] = useState<Item[]>([]);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const [formData, setFormData] = useState<Partial<Item>>({
     name: '',
     price: 0,
@@ -28,8 +32,29 @@ export default function AdminPage() {
   });
 
   useEffect(() => {
-    fetchItems();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/check');
+      if (response.ok) {
+        setIsAuthenticated(true);
+        fetchItems();
+      } else {
+        router.push('/admin/login');
+      }
+    } catch (error) {
+      router.push('/admin/login');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/admin/login');
+  };
 
   const fetchItems = async () => {
     try {
@@ -109,6 +134,18 @@ export default function AdminPage() {
     setIsAddingNew(false);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-2xl text-gray-900 dark:text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8">
       <div className="container mx-auto px-4">
@@ -116,9 +153,17 @@ export default function AdminPage() {
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
             Admin Dashboard
           </h1>
-          <Link href="/" className="text-blue-600 dark:text-blue-400 hover:underline">
-            ← Back to Home
-          </Link>
+          <div className="flex gap-4 items-center">
+            <Link href="/" className="text-blue-600 dark:text-blue-400 hover:underline">
+              ← Back to Home
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Add/Edit Form */}
