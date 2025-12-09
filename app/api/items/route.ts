@@ -1,28 +1,15 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const dataFilePath = path.join(process.cwd(), 'data', 'items.json');
-
-function readData() {
-  const fileContents = fs.readFileSync(dataFilePath, 'utf8');
-  return JSON.parse(fileContents);
-}
-
-function writeData(data: any) {
-  fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-}
+import { readItemsData, writeItemsData } from '@/lib/data';
 
 export async function GET() {
   try {
-    const data = readData();
+    const data = readItemsData();
     return NextResponse.json(data);
   } catch (error) {
     console.error('Failed to read data:', error);
     return NextResponse.json({
       error: 'Failed to read data',
-      details: error instanceof Error ? error.message : 'Unknown error',
-      path: dataFilePath
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }
@@ -30,7 +17,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const newItem = await request.json();
-    const data = readData();
+    const data = readItemsData();
 
     if (newItem.category === 'best-seller') {
       data.bestSellers.push(newItem);
@@ -38,7 +25,7 @@ export async function POST(request: Request) {
       data.saleItems.push(newItem);
     }
 
-    writeData(data);
+    writeItemsData(data);
     return NextResponse.json({ success: true, item: newItem });
   } catch (error) {
     console.error('Failed to add item:', error);
@@ -52,7 +39,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const updatedItem = await request.json();
-    const data = readData();
+    const data = readItemsData();
 
     if (updatedItem.category === 'best-seller') {
       const index = data.bestSellers.findIndex((item: any) => item.id === updatedItem.id);
@@ -66,7 +53,7 @@ export async function PUT(request: Request) {
       }
     }
 
-    writeData(data);
+    writeItemsData(data);
     return NextResponse.json({ success: true, item: updatedItem });
   } catch (error) {
     console.error('Failed to update item:', error);
@@ -87,7 +74,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Missing id or category' }, { status: 400 });
     }
 
-    const data = readData();
+    const data = readItemsData();
 
     if (category === 'best-seller') {
       data.bestSellers = data.bestSellers.filter((item: any) => item.id !== id);
@@ -95,7 +82,7 @@ export async function DELETE(request: Request) {
       data.saleItems = data.saleItems.filter((item: any) => item.id !== id);
     }
 
-    writeData(data);
+    writeItemsData(data);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to delete item:', error);

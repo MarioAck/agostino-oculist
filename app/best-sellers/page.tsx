@@ -1,11 +1,9 @@
 import Link from "next/link";
+import { readItemsData } from "@/lib/data";
 
 async function getBestSellers() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/items`, { cache: 'no-store' });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.bestSellers || [];
+  const data = readItemsData();
+  return data.bestSellers;
 }
 
 export default async function BestSellers() {
