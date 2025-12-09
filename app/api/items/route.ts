@@ -18,7 +18,12 @@ export async function GET() {
     const data = readData();
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to read data' }, { status: 500 });
+    console.error('Failed to read data:', error);
+    return NextResponse.json({
+      error: 'Failed to read data',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      path: dataFilePath
+    }, { status: 500 });
   }
 }
 
@@ -36,7 +41,11 @@ export async function POST(request: Request) {
     writeData(data);
     return NextResponse.json({ success: true, item: newItem });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to add item' }, { status: 500 });
+    console.error('Failed to add item:', error);
+    return NextResponse.json({
+      error: 'Failed to add item',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
@@ -60,7 +69,11 @@ export async function PUT(request: Request) {
     writeData(data);
     return NextResponse.json({ success: true, item: updatedItem });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to update item' }, { status: 500 });
+    console.error('Failed to update item:', error);
+    return NextResponse.json({
+      error: 'Failed to update item',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
@@ -85,6 +98,10 @@ export async function DELETE(request: Request) {
     writeData(data);
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete item' }, { status: 500 });
+    console.error('Failed to delete item:', error);
+    return NextResponse.json({
+      error: 'Failed to delete item',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
