@@ -66,14 +66,34 @@ Click "Deploy" and wait for the build to complete.
 **Cause**: File permission issues or missing persistent volumes
 
 **Solution**:
-1. Verify that persistent volumes are configured correctly
-2. Check container logs: `docker logs <container-name>`
-3. Ensure the volumes have correct permissions:
+
+#### Option 1: Don't use volumes (simplest, but data won't persist on redeploy)
+Remove the volume configurations from Coolify. The app will create and manage its own data internally.
+
+#### Option 2: Use volumes with proper permissions (recommended for production)
+1. SSH into your Coolify server
+2. Create directories and set permissions:
    ```bash
-   # On the host machine
-   sudo chown -R 1001:1001 /path/to/data
-   sudo chown -R 1001:1001 /path/to/uploads
+   # Create directories
+   sudo mkdir -p /var/lib/docker/volumes/agostino-data/_data
+   sudo mkdir -p /var/lib/docker/volumes/agostino-uploads/_data
+
+   # Set ownership to user 1001 (nextjs user in container)
+   sudo chown -R 1001:1001 /var/lib/docker/volumes/agostino-data/_data
+   sudo chown -R 1001:1001 /var/lib/docker/volumes/agostino-uploads/_data
+
+   # Set permissions
+   sudo chmod -R 755 /var/lib/docker/volumes/agostino-data/_data
+   sudo chmod -R 755 /var/lib/docker/volumes/agostino-uploads/_data
    ```
+
+3. In Coolify, configure volumes:
+   - **Volume 1**: `/var/lib/docker/volumes/agostino-data/_data` → `/app/data`
+   - **Volume 2**: `/var/lib/docker/volumes/agostino-uploads/_data` → `/app/public/uploads`
+
+4. Redeploy the application
+
+5. Check the container logs for the message "✓ Data directory is writable"
 
 ### Issue: Images not persisting after restart
 
