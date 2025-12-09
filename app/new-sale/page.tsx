@@ -36,31 +36,37 @@ export default async function NewSale() {
           {saleItems.map((item: any) => (
             <div
               key={item.id}
-              className="relative bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 p-6"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
             >
-              <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                {item.discount}% OFF
+              <div className="relative aspect-square bg-gradient-to-br from-red-100 to-orange-200 dark:from-gray-700 dark:to-gray-600">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                  {item.discount}% OFF
+                </div>
               </div>
-              <div className="aspect-square bg-gradient-to-br from-red-100 to-orange-200 dark:from-gray-700 dark:to-gray-600 rounded-lg mb-4 flex items-center justify-center text-6xl">
-                {item.image}
+              <div className="p-6">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  {item.name}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  {item.description}
+                </p>
+                <div className="mb-4">
+                  <span className="text-lg text-gray-500 dark:text-gray-400 line-through mr-2">
+                    ${item.originalPrice}
+                  </span>
+                  <span className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    ${item.price}
+                  </span>
+                </div>
+                <button className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition-colors duration-200 font-semibold">
+                  Buy Now
+                </button>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                {item.name}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                {item.description}
-              </p>
-              <div className="mb-4">
-                <span className="text-lg text-gray-500 dark:text-gray-400 line-through mr-2">
-                  ${item.originalPrice}
-                </span>
-                <span className="text-2xl font-bold text-red-600 dark:text-red-400">
-                  ${item.price}
-                </span>
-              </div>
-              <button className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition-colors duration-200 font-semibold">
-                Buy Now
-              </button>
             </div>
           ))}
         </div>

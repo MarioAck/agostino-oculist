@@ -27,9 +27,11 @@ export default function AdminPage() {
     name: '',
     price: 0,
     description: '',
-    image: '👓',
+    image: '',
     category: 'best-seller',
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
 
   useEffect(() => {
     checkAuth();
@@ -75,15 +77,60 @@ export default function AdminPage() {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+
+    const data = await response.json();
+    return data.url;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      let imageUrl = formData.image || '';
+
+      // Upload new image if file is selected
+      if (selectedFile) {
+        imageUrl = await uploadImage(selectedFile);
+      }
+
+      // Validate that we have an image
+      if (!imageUrl) {
+        alert('Please upload an image');
+        return;
+      }
+
+      const itemData = { ...formData, image: imageUrl };
+
       if (editingItem) {
         await fetch('/api/items', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formData, id: editingItem.id }),
+          body: JSON.stringify({ ...itemData, id: editingItem.id }),
         });
       } else {
         const newId = formData.category === 'best-seller'
@@ -92,7 +139,7 @@ export default function AdminPage() {
         await fetch('/api/items', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...formData, id: newId }),
+          body: JSON.stringify({ ...itemData, id: newId }),
         });
       }
 
@@ -100,12 +147,15 @@ export default function AdminPage() {
       resetForm();
     } catch (error) {
       console.error('Failed to save item:', error);
+      alert('Failed to save item. Please try again.');
     }
   };
 
   const handleEdit = (item: Item) => {
     setEditingItem(item);
     setFormData(item);
+    setImagePreview(item.image);
+    setSelectedFile(null);
     setIsAddingNew(false);
   };
 
@@ -127,11 +177,13 @@ export default function AdminPage() {
       name: '',
       price: 0,
       description: '',
-      image: '👓',
+      image: '',
       category: 'best-seller',
     });
     setEditingItem(null);
     setIsAddingNew(false);
+    setSelectedFile(null);
+    setImagePreview('');
   };
 
   if (isLoading) {
@@ -258,17 +310,26 @@ export default function AdminPage() {
                   </>
                 )}
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Image (Emoji or URL)
+                    Product Image
                   </label>
                   <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-600 dark:file:text-gray-200"
                   />
+                  {imagePreview && (
+                    <div className="mt-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300 dark:border-gray-600"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -312,7 +373,11 @@ export default function AdminPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {bestSellers.map((item) => (
               <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                <div className="text-4xl mb-2">{item.image}</div>
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-48 object-cover rounded-lg mb-3"
+                />
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                   {item.name}
                 </h3>
@@ -349,9 +414,13 @@ export default function AdminPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {saleItems.map((item) => (
               <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="text-4xl">{item.image}</div>
-                  <span className="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                <div className="relative mb-3">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
                     {item.discount}% OFF
                   </span>
                 </div>
