@@ -10,9 +10,9 @@ services:
       - "3000:3000"
     volumes:
       # Mount data directory to persist item changes
-      - ./data:/app/data
+      - ./app/data:/data
       # Mount uploads directory to persist uploaded images
-      - ./public/uploads:/app/public/uploads
+      - ./app/public/uploads:/public/uploads
     environment:
       - NODE_ENV=production
       - PORT=3000
