@@ -3,17 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-interface Item {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  discount?: number;
-  description: string;
-  image: string;
-  category: "best-seller" | "sale";
-}
+import { Item } from "@/lib/data";
 
 export default function AdminPage() {
   const [bestSellers, setBestSellers] = useState<Item[]>([]);
@@ -88,7 +78,6 @@ export default function AdminPage() {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -120,12 +109,10 @@ export default function AdminPage() {
     try {
       let imageUrl = formData.image || "";
 
-      // Upload new image if file is selected
       if (selectedFile) {
         imageUrl = await uploadImage(selectedFile);
       }
 
-      // Validate that we have an image
       if (!imageUrl) {
         alert("Please upload an image");
         return;
@@ -140,8 +127,8 @@ export default function AdminPage() {
           body: JSON.stringify({ ...itemData, id: editingItem.id }),
         });
       } else {
-        // Generate new ID based on category
-        const categoryItems = formData.category === "best-seller" ? bestSellers : saleItems;
+        const categoryItems =
+          formData.category === "best-seller" ? bestSellers : saleItems;
         const prefix = formData.category === "best-seller" ? "bs" : "sale";
         const newId = `${prefix}${categoryItems.length + 1}`;
 
@@ -166,6 +153,7 @@ export default function AdminPage() {
     setImagePreview(item.image);
     setSelectedFile(null);
     setIsAddingNew(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id: string) => {
@@ -197,8 +185,10 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-2xl text-gray-900 dark:text-white">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-2xl font-semibold text-gray-900 dark:text-white">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -208,22 +198,28 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-8">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-            Admin Dashboard
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-16">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-12">
+          <div>
+            <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-2">
+              Admin Dashboard
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Manage your eyewear inventory
+            </p>
+          </div>
           <div className="flex gap-4 items-center">
             <Link
               href="/"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-purple-600 dark:text-purple-400 hover:underline font-medium"
             >
               ← Back to Home
             </Link>
             <button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full transition-colors duration-200 font-semibold shadow-lg"
             >
               Logout
             </button>
@@ -231,9 +227,9 @@ export default function AdminPage() {
         </div>
 
         {/* Add/Edit Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {editingItem
                 ? "Edit Item"
                 : isAddingNew
@@ -243,7 +239,7 @@ export default function AdminPage() {
             {!isAddingNew && !editingItem && (
               <button
                 onClick={() => setIsAddingNew(true)}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg transform hover:scale-105"
               >
                 + Add New Item
               </button>
@@ -251,10 +247,10 @@ export default function AdminPage() {
           </div>
 
           {(isAddingNew || editingItem) && (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Name
                   </label>
                   <input
@@ -263,19 +259,20 @@ export default function AdminPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    placeholder="Enter product name"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Category
                   </label>
                   <select
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   >
                     <option value="best-seller">Best Seller</option>
                     <option value="sale">Sale</option>
@@ -283,7 +280,7 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Price ($)
                   </label>
                   <input
@@ -292,14 +289,16 @@ export default function AdminPage() {
                     value={formData.price}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    step="0.01"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    placeholder="0.00"
                   />
                 </div>
 
                 {formData.category === "sale" && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Original Price ($)
                       </label>
                       <input
@@ -307,12 +306,14 @@ export default function AdminPage() {
                         name="originalPrice"
                         value={formData.originalPrice || 0}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        step="0.01"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        placeholder="0.00"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                         Discount (%)
                       </label>
                       <input
@@ -320,39 +321,42 @@ export default function AdminPage() {
                         name="discount"
                         value={formData.discount || 0}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        placeholder="0"
                       />
                     </div>
                   </>
                 )}
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Product Image
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-600 dark:file:text-gray-200"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-gray-600 dark:file:text-gray-200 file:cursor-pointer file:transition-all"
                   />
                   {imagePreview && (
-                    <div className="mt-3">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <div className="mt-4">
+                      <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
                         Preview:
                       </p>
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-32 h-32 object-cover rounded-lg border-2 border-gray-300 dark:border-gray-600"
-                      />
+                      <div className="inline-block rounded-xl overflow-hidden border-4 border-purple-200 dark:border-purple-700 shadow-lg">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-40 h-40 object-cover"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                   Description
                 </label>
                 <textarea
@@ -360,21 +364,22 @@ export default function AdminPage() {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="Enter product description"
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-4 pt-4">
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg transform hover:scale-105"
                 >
                   {editingItem ? "Update Item" : "Add Item"}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors"
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg"
                 >
                   Cancel
                 </button>
@@ -383,102 +388,134 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* Best Sellers List */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Best Sellers ({bestSellers.length})
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Best Sellers Section */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+              Best Sellers
+            </h2>
+            <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-lg font-semibold">
+              {bestSellers.length}
+            </span>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {bestSellers.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
               >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover rounded-lg mb-3"
-                />
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                  {item.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                  {item.description}
-                </p>
-                <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-3">
-                  ${item.price}
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded transition-colors text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Sale Items List */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Sale Items ({saleItems.length})
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {saleItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-              >
-                <div className="relative mb-3">
+                <div className="relative aspect-square bg-gradient-to-br from-blue-100 to-blue-200 dark:from-gray-700 dark:to-gray-600">
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full h-full object-cover"
                   />
-                  <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
-                    {item.discount}% OFF
-                  </span>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                  {item.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                  {item.description}
-                </p>
-                <div className="mb-3">
-                  <span className="text-sm text-gray-500 line-through mr-2">
-                    ${item.originalPrice}
-                  </span>
-                  <span className="text-lg font-bold text-red-600 dark:text-red-400">
-                    ${item.price}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded transition-colors text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors text-sm"
-                  >
-                    Delete
-                  </button>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    {item.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 min-h-[48px]">
+                    {item.description}
+                  </p>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      ${item.price}
+                    </span>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+          {bestSellers.length === 0 && (
+            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                No best sellers yet. Add your first item!
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Sale Items Section */}
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
+              Sale Items
+            </h2>
+            <span className="bg-red-600 text-white px-4 py-1 rounded-full text-lg font-semibold">
+              {saleItems.length}
+            </span>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {saleItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+              >
+                <div className="relative aspect-square bg-gradient-to-br from-red-100 to-orange-200 dark:from-gray-700 dark:to-gray-600">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                    {item.discount}% OFF
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    {item.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 min-h-[48px]">
+                    {item.description}
+                  </p>
+                  <div className="mb-4">
+                    <span className="text-lg text-gray-500 dark:text-gray-400 line-through mr-2">
+                      ${item.originalPrice}
+                    </span>
+                    <span className="text-2xl font-bold text-red-600 dark:text-red-400">
+                      ${item.price}
+                    </span>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleEdit(item)}
+                      className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {saleItems.length === 0 && (
+            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                No sale items yet. Add your first item!
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
