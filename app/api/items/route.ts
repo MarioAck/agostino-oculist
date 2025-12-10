@@ -19,7 +19,12 @@ export async function POST(request: Request) {
     const newItem = await request.json();
     const data = readItemsData();
 
-    data.items.push(newItem);
+    // Add to appropriate array based on category
+    if (newItem.category === 'best-seller') {
+      data.bestSellers.push(newItem);
+    } else if (newItem.category === 'sale') {
+      data.saleItems.push(newItem);
+    }
 
     writeItemsData(data);
     return NextResponse.json({ success: true, item: newItem });
@@ -37,9 +42,26 @@ export async function PUT(request: Request) {
     const updatedItem = await request.json();
     const data = readItemsData();
 
-    const index = data.items.findIndex((item: any) => item.id === updatedItem.id);
-    if (index !== -1) {
-      data.items[index] = updatedItem;
+    // Find and update in appropriate array
+    const bestSellerIndex = data.bestSellers.findIndex((item: any) => item.id === updatedItem.id);
+    const saleItemIndex = data.saleItems.findIndex((item: any) => item.id === updatedItem.id);
+
+    if (bestSellerIndex !== -1) {
+      // If category changed, move to other array
+      if (updatedItem.category === 'sale') {
+        data.bestSellers.splice(bestSellerIndex, 1);
+        data.saleItems.push(updatedItem);
+      } else {
+        data.bestSellers[bestSellerIndex] = updatedItem;
+      }
+    } else if (saleItemIndex !== -1) {
+      // If category changed, move to other array
+      if (updatedItem.category === 'best-seller') {
+        data.saleItems.splice(saleItemIndex, 1);
+        data.bestSellers.push(updatedItem);
+      } else {
+        data.saleItems[saleItemIndex] = updatedItem;
+      }
     }
 
     writeItemsData(data);
@@ -63,7 +85,9 @@ export async function DELETE(request: Request) {
     }
 
     const data = readItemsData();
-    data.items = data.items.filter((item: any) => item.id !== id);
+    // Filter from both arrays
+    data.bestSellers = data.bestSellers.filter((item: any) => item.id !== id);
+    data.saleItems = data.saleItems.filter((item: any) => item.id !== id);
 
     writeItemsData(data);
     return NextResponse.json({ success: true });
