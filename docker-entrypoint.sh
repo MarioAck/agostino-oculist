@@ -6,45 +6,79 @@ init_directories() {
   DATA_DIR="/app/data"
   DATA_FILE="$DATA_DIR/items.json"
 
-  echo "Checking directories..."
+  echo "=== Starting initialization ==="
+  echo "Current user: $(whoami)"
+  echo "Current user ID: $(id -u)"
+  echo "Working directory: $(pwd)"
 
-  # Create data directory if it doesn't exist
+  # Check if data directory exists
   if [ ! -d "$DATA_DIR" ]; then
     echo "Creating data directory..."
-    mkdir -p "$DATA_DIR" || echo "Could not create data directory, it may be mounted"
+    mkdir -p "$DATA_DIR" 2>&1 || echo "WARNING: Could not create data directory"
   fi
 
-  # Create empty items.json if it doesn't exist
+  # Show directory permissions
+  echo "Data directory info:"
+  ls -la "$DATA_DIR" 2>&1 || echo "Could not list data directory"
+
+  # Create items.json if it doesn't exist
   if [ ! -f "$DATA_FILE" ]; then
-    echo "Creating empty items.json file..."
-    cat > "$DATA_FILE" << 'EOF' || echo "Could not create items.json, check permissions"
+    echo "items.json does NOT exist, creating from template..."
+
+    # Try to copy from template first
+    TEMPLATE_FILE="/app/data-template/items.json"
+    if [ -f "$TEMPLATE_FILE" ]; then
+      echo "Copying from template: $TEMPLATE_FILE"
+      if cp "$TEMPLATE_FILE" "$DATA_FILE" 2>&1; then
+        echo "✓ items.json copied from template successfully"
+        ls -la "$DATA_FILE" 2>&1
+      else
+        echo "✗ FAILED to copy from template"
+        echo "Trying to create empty file manually..."
+        cat > "$DATA_FILE" << 'EOF' && echo "✓ Empty file created" || echo "✗ Failed to create file"
 {
   "bestSellers": [],
   "saleItems": []
 }
 EOF
-    echo "Empty items.json created"
+      fi
+    else
+      echo "Template not found, creating empty file..."
+      cat > "$DATA_FILE" << 'EOF' && echo "✓ Empty file created" || echo "✗ Failed to create file"
+{
+  "bestSellers": [],
+  "saleItems": []
+}
+EOF
+    fi
+
+    # Check if file was created
+    if [ -f "$DATA_FILE" ]; then
+      echo "✓ items.json exists now"
+      ls -la "$DATA_FILE" 2>&1
+    else
+      echo "✗ CRITICAL: Failed to create items.json"
+      echo "Directory permissions:"
+      ls -lad "$DATA_DIR" 2>&1
+      echo "Attempting to write test file..."
+      echo "test" > "$DATA_DIR/test.txt" 2>&1 && echo "Test write succeeded" || echo "Test write FAILED - check volume permissions!"
+    fi
   else
-    echo "items.json already exists"
+    echo "✓ items.json already exists"
+    ls -la "$DATA_FILE" 2>&1
+    # Show first few lines of the file
+    echo "File contents preview:"
+    head -n 5 "$DATA_FILE" 2>&1 || echo "Could not read file"
   fi
 
   # Ensure uploads directory exists
   UPLOADS_DIR="/app/public/uploads"
   if [ ! -d "$UPLOADS_DIR" ]; then
     echo "Creating uploads directory..."
-    mkdir -p "$UPLOADS_DIR" || echo "Could not create uploads directory"
+    mkdir -p "$UPLOADS_DIR" 2>&1 || echo "WARNING: Could not create uploads directory"
   fi
 
-  # Test write permissions
-  echo "Testing write permissions..."
-  if [ -w "$DATA_DIR" ]; then
-    echo "✓ Data directory is writable"
-  else
-    echo "✗ WARNING: Data directory is NOT writable! Changes will not be saved."
-    echo "  Please check volume permissions in Coolify."
-  fi
-
-  echo "Initialization complete!"
+  echo "=== Initialization complete ==="
 }
 
 # Initialize directories

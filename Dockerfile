@@ -35,18 +35,17 @@ RUN adduser --system --uid 1001 nextjs
 # Copy necessary files
 COPY --from=builder /app/public ./public
 
-# Create directories with proper permissions BEFORE copying data
-# This ensures they exist even if volumes override them
-RUN mkdir -p .next public/uploads data
+# Create directories with proper permissions
+RUN mkdir -p .next public/uploads data data-template
 
-# Copy data after creating the directory
-COPY --from=builder /app/data ./data
+# Copy data to template location (survives volume mounts)
+COPY --from=builder /app/data/items.json ./data-template/items.json
 
 # Set ownership for all directories
-RUN chown -R nextjs:nodejs .next public/uploads data
+RUN chown -R nextjs:nodejs .next public/uploads data data-template
 
 # Ensure data directory is writable
-RUN chmod -R 755 data
+RUN chmod -R 755 data data-template
 
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
