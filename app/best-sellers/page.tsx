@@ -3,7 +3,7 @@ import { readItemsData } from "@/lib/data";
 
 async function getBestSellers() {
   const data = readItemsData();
-  return data.bestSellers;
+  return data.items.filter(item => item.category === 'best-seller');
 }
 
 export default async function BestSellers() {

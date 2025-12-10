@@ -16,8 +16,7 @@ interface Item {
 }
 
 export default function AdminPage() {
-  const [bestSellers, setBestSellers] = useState<Item[]>([]);
-  const [saleItems, setSaleItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,8 +61,7 @@ export default function AdminPage() {
     try {
       const response = await fetch('/api/items');
       const data = await response.json();
-      setBestSellers(data.bestSellers || []);
-      setSaleItems(data.saleItems || []);
+      setItems(data.items || []);
     } catch (error) {
       console.error('Failed to fetch items:', error);
     }
@@ -133,9 +131,11 @@ export default function AdminPage() {
           body: JSON.stringify({ ...itemData, id: editingItem.id }),
         });
       } else {
-        const newId = formData.category === 'best-seller'
-          ? `bs${bestSellers.length + 1}`
-          : `sale${saleItems.length + 1}`;
+        // Generate new ID based on category
+        const categoryItems = items.filter(item => item.category === formData.category);
+        const prefix = formData.category === 'best-seller' ? 'bs' : 'sale';
+        const newId = `${prefix}${categoryItems.length + 1}`;
+
         await fetch('/api/items', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -159,11 +159,11 @@ export default function AdminPage() {
     setIsAddingNew(false);
   };
 
-  const handleDelete = async (id: string, category: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      await fetch(`/api/items?id=${id}&category=${category}`, {
+      await fetch(`/api/items?id=${id}`, {
         method: 'DELETE',
       });
       fetchItems();
@@ -365,54 +365,13 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* Best Sellers List */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Best Sellers ({bestSellers.length})
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {bestSellers.map((item) => (
-              <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-full h-48 object-cover rounded-lg mb-3"
-                />
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                  {item.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                  {item.description}
-                </p>
-                <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-3">
-                  ${item.price}
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded transition-colors text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id, item.category)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Sale Items List */}
+        {/* All Items List */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Sale Items ({saleItems.length})
+            All Items ({items.length})
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {saleItems.map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                 <div className="relative mb-3">
                   <img
@@ -420,8 +379,13 @@ export default function AdminPage() {
                     alt={item.name}
                     className="w-full h-48 object-cover rounded-lg"
                   />
-                  <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
-                    {item.discount}% OFF
+                  {item.category === 'sale' && item.discount && (
+                    <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                      {item.discount}% OFF
+                    </span>
+                  )}
+                  <span className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded text-xs font-bold">
+                    {item.category === 'best-seller' ? '🏆 Best Seller' : '🔥 Sale'}
                   </span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
@@ -431,10 +395,12 @@ export default function AdminPage() {
                   {item.description}
                 </p>
                 <div className="mb-3">
-                  <span className="text-sm text-gray-500 line-through mr-2">
-                    ${item.originalPrice}
-                  </span>
-                  <span className="text-lg font-bold text-red-600 dark:text-red-400">
+                  {item.originalPrice && (
+                    <span className="text-sm text-gray-500 line-through mr-2">
+                      ${item.originalPrice}
+                    </span>
+                  )}
+                  <span className={`text-lg font-bold ${item.category === 'sale' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`}>
                     ${item.price}
                   </span>
                 </div>
@@ -446,7 +412,7 @@ export default function AdminPage() {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id, item.category)}
+                    onClick={() => handleDelete(item.id)}
                     className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors text-sm"
                   >
                     Delete

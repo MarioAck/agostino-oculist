@@ -3,7 +3,7 @@ import { readItemsData } from "@/lib/data";
 
 async function getSaleItems() {
   const data = readItemsData();
-  return data.saleItems;
+  return data.items.filter(item => item.category === 'sale');
 }
 
 export default async function NewSale() {

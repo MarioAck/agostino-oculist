@@ -1,75 +1,28 @@
 #!/bin/sh
 set -e
 
-# Function to initialize data file if it doesn't exist
-init_data_file() {
+# Function to initialize directories
+init_directories() {
   DATA_DIR="/app/data"
   DATA_FILE="$DATA_DIR/items.json"
 
-  echo "Checking data directory and file..."
+  echo "Checking directories..."
 
-  # Create data directory if it doesn't exist (as current user)
+  # Create data directory if it doesn't exist
   if [ ! -d "$DATA_DIR" ]; then
     echo "Creating data directory..."
     mkdir -p "$DATA_DIR" || echo "Could not create data directory, it may be mounted"
   fi
 
-  # Create items.json with default data if it doesn't exist
+  # Create empty items.json if it doesn't exist
   if [ ! -f "$DATA_FILE" ]; then
-    echo "Creating default items.json file..."
+    echo "Creating empty items.json file..."
     cat > "$DATA_FILE" << 'EOF' || echo "Could not create items.json, check permissions"
 {
-  "bestSellers": [
-    {
-      "id": "bs1",
-      "name": "Classic Aviator",
-      "price": 129,
-      "description": "Timeless style for every occasion",
-      "image": "👓",
-      "category": "best-seller"
-    },
-    {
-      "id": "bs2",
-      "name": "Modern Wayfarer",
-      "price": 149,
-      "description": "Contemporary design meets comfort",
-      "image": "👓",
-      "category": "best-seller"
-    },
-    {
-      "id": "bs3",
-      "name": "Round Vintage",
-      "price": 139,
-      "description": "Retro elegance for the discerning eye",
-      "image": "👓",
-      "category": "best-seller"
-    }
-  ],
-  "saleItems": [
-    {
-      "id": "sale1",
-      "name": "Summer Shades",
-      "price": 99,
-      "originalPrice": 159,
-      "discount": 38,
-      "description": "Perfect for sunny days",
-      "image": "🕶️",
-      "category": "sale"
-    },
-    {
-      "id": "sale2",
-      "name": "Designer Collection",
-      "price": 149,
-      "originalPrice": 249,
-      "discount": 40,
-      "description": "Luxury meets affordability",
-      "image": "🕶️",
-      "category": "sale"
-    }
-  ]
+  "items": []
 }
 EOF
-    echo "Default items.json created successfully"
+    echo "Empty items.json created"
   else
     echo "items.json already exists"
   fi
@@ -90,11 +43,11 @@ EOF
     echo "  Please check volume permissions in Coolify."
   fi
 
-  echo "Data initialization complete!"
+  echo "Initialization complete!"
 }
 
-# Initialize data file
-init_data_file
+# Initialize directories
+init_directories
 
 # Execute the main command
 echo "Starting application..."

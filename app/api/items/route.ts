@@ -19,11 +19,7 @@ export async function POST(request: Request) {
     const newItem = await request.json();
     const data = readItemsData();
 
-    if (newItem.category === 'best-seller') {
-      data.bestSellers.push(newItem);
-    } else if (newItem.category === 'sale') {
-      data.saleItems.push(newItem);
-    }
+    data.items.push(newItem);
 
     writeItemsData(data);
     return NextResponse.json({ success: true, item: newItem });
@@ -41,16 +37,9 @@ export async function PUT(request: Request) {
     const updatedItem = await request.json();
     const data = readItemsData();
 
-    if (updatedItem.category === 'best-seller') {
-      const index = data.bestSellers.findIndex((item: any) => item.id === updatedItem.id);
-      if (index !== -1) {
-        data.bestSellers[index] = updatedItem;
-      }
-    } else if (updatedItem.category === 'sale') {
-      const index = data.saleItems.findIndex((item: any) => item.id === updatedItem.id);
-      if (index !== -1) {
-        data.saleItems[index] = updatedItem;
-      }
+    const index = data.items.findIndex((item: any) => item.id === updatedItem.id);
+    if (index !== -1) {
+      data.items[index] = updatedItem;
     }
 
     writeItemsData(data);
@@ -68,19 +57,13 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    const category = searchParams.get('category');
 
-    if (!id || !category) {
-      return NextResponse.json({ error: 'Missing id or category' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
     }
 
     const data = readItemsData();
-
-    if (category === 'best-seller') {
-      data.bestSellers = data.bestSellers.filter((item: any) => item.id !== id);
-    } else if (category === 'sale') {
-      data.saleItems = data.saleItems.filter((item: any) => item.id !== id);
-    }
+    data.items = data.items.filter((item: any) => item.id !== id);
 
     writeItemsData(data);
     return NextResponse.json({ success: true });
