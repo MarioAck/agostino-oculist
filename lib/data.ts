@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 export interface Item {
   id: string;
@@ -9,23 +9,24 @@ export interface Item {
   discount?: number;
   description: string;
   image: string;
-  category: 'best-seller' | 'sale';
+  category: "best-seller" | "sale";
 }
 
 export interface ItemsData {
-  items: Item[];
+  saleItems: Item[];
+  bestSellers: Item[];
 }
 
-const dataFilePath = path.join(process.cwd(), 'data', 'items.json');
+const dataFilePath = path.join(process.cwd(), "data", "items.json");
 
 export function readItemsData(): ItemsData {
   try {
-    const fileContents = fs.readFileSync(dataFilePath, 'utf8');
+    const fileContents = fs.readFileSync(dataFilePath, "utf8");
     return JSON.parse(fileContents);
   } catch (error) {
-    console.error('Failed to read items data:', error);
-    // Return empty array if file doesn't exist or can't be read
-    return { items: [] };
+    console.error("Failed to read items data:", error);
+    // Return empty arrays if file doesn't exist or can't be read
+    return { bestSellers: [], saleItems: [] };
   }
 }
 
@@ -38,9 +39,9 @@ export function writeItemsData(data: ItemsData): void {
     }
 
     fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-    console.log('Successfully wrote items data');
+    console.log("Successfully wrote items data");
   } catch (error) {
-    console.error('Failed to write items data:', error);
+    console.error("Failed to write items data:", error);
     throw error;
   }
 }

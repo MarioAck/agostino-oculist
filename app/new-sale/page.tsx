@@ -3,7 +3,7 @@ import { readItemsData } from "@/lib/data";
 
 async function getSaleItems() {
   const data = readItemsData();
-  return data.items.filter(item => item.category === 'sale');
+  return data.saleItems;
 }
 
 export default async function NewSale() {
@@ -13,10 +13,16 @@ export default async function NewSale() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-16">
         <div className="flex justify-between items-center mb-8">
-          <Link href="/" className="text-red-600 dark:text-red-400 hover:underline">
+          <Link
+            href="/"
+            className="text-red-600 dark:text-red-400 hover:underline"
+          >
             ← Back to Home
           </Link>
-          <Link href="/admin" className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition-colors">
+          <Link
+            href="/admin"
+            className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition-colors"
+          >
             Admin Panel
           </Link>
         </div>

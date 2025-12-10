@@ -19,7 +19,8 @@ init_directories() {
     echo "Creating empty items.json file..."
     cat > "$DATA_FILE" << 'EOF' || echo "Could not create items.json, check permissions"
 {
-  "items": []
+  "bestSellers": [],
+  "saleItems": []
 }
 EOF
     echo "Empty items.json created"

@@ -47,6 +47,14 @@
       "description": "Professional and polished",
       "image": "👓",
       "category": "best-seller"
+    },
+    {
+      "name": "test",
+      "price": 0,
+      "description": "",
+      "image": "/uploads/1765294964060-PEAK.jpg",
+      "category": "best-seller",
+      "id": "bs7"
     }
   ],
   "saleItems": [

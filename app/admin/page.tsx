@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Item {
   id: string;
@@ -12,25 +12,26 @@ interface Item {
   discount?: number;
   description: string;
   image: string;
-  category: 'best-seller' | 'sale';
+  category: "best-seller" | "sale";
 }
 
 export default function AdminPage() {
-  const [items, setItems] = useState<Item[]>([]);
+  const [bestSellers, setBestSellers] = useState<Item[]>([]);
+  const [saleItems, setSaleItems] = useState<Item[]>([]);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const [formData, setFormData] = useState<Partial<Item>>({
-    name: '',
+    name: "",
     price: 0,
-    description: '',
-    image: '',
-    category: 'best-seller',
+    description: "",
+    image: "",
+    category: "best-seller",
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   useEffect(() => {
     checkAuth();
@@ -38,40 +39,48 @@ export default function AdminPage() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/check');
+      const response = await fetch("/api/auth/check");
       if (response.ok) {
         setIsAuthenticated(true);
         fetchItems();
       } else {
-        router.push('/admin/login');
+        router.push("/admin/login");
       }
     } catch (error) {
-      router.push('/admin/login');
+      router.push("/admin/login");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    router.push('/admin/login');
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/admin/login");
   };
 
   const fetchItems = async () => {
     try {
-      const response = await fetch('/api/items');
+      const response = await fetch("/api/items");
       const data = await response.json();
-      setItems(data.items || []);
+      setBestSellers(data.bestSellers || []);
+      setSaleItems(data.saleItems || []);
     } catch (error) {
-      console.error('Failed to fetch items:', error);
+      console.error("Failed to fetch items:", error);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' || name === 'originalPrice' || name === 'discount' ? Number(value) : value,
+      [name]:
+        name === "price" || name === "originalPrice" || name === "discount"
+          ? Number(value)
+          : value,
     }));
   };
 
@@ -90,15 +99,15 @@ export default function AdminPage() {
 
   const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
-    const response = await fetch('/api/upload', {
-      method: 'POST',
+    const response = await fetch("/api/upload", {
+      method: "POST",
       body: formData,
     });
 
     if (!response.ok) {
-      throw new Error('Failed to upload image');
+      throw new Error("Failed to upload image");
     }
 
     const data = await response.json();
@@ -109,7 +118,7 @@ export default function AdminPage() {
     e.preventDefault();
 
     try {
-      let imageUrl = formData.image || '';
+      let imageUrl = formData.image || "";
 
       // Upload new image if file is selected
       if (selectedFile) {
@@ -118,27 +127,27 @@ export default function AdminPage() {
 
       // Validate that we have an image
       if (!imageUrl) {
-        alert('Please upload an image');
+        alert("Please upload an image");
         return;
       }
 
       const itemData = { ...formData, image: imageUrl };
 
       if (editingItem) {
-        await fetch('/api/items', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/items", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...itemData, id: editingItem.id }),
         });
       } else {
         // Generate new ID based on category
-        const categoryItems = items.filter(item => item.category === formData.category);
-        const prefix = formData.category === 'best-seller' ? 'bs' : 'sale';
+        const categoryItems = formData.category === "best-seller" ? bestSellers : saleItems;
+        const prefix = formData.category === "best-seller" ? "bs" : "sale";
         const newId = `${prefix}${categoryItems.length + 1}`;
 
-        await fetch('/api/items', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch("/api/items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...itemData, id: newId }),
         });
       }
@@ -146,8 +155,8 @@ export default function AdminPage() {
       fetchItems();
       resetForm();
     } catch (error) {
-      console.error('Failed to save item:', error);
-      alert('Failed to save item. Please try again.');
+      console.error("Failed to save item:", error);
+      alert("Failed to save item. Please try again.");
     }
   };
 
@@ -160,30 +169,30 @@ export default function AdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    if (!confirm("Are you sure you want to delete this item?")) return;
 
     try {
       await fetch(`/api/items?id=${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       fetchItems();
     } catch (error) {
-      console.error('Failed to delete item:', error);
+      console.error("Failed to delete item:", error);
     }
   };
 
   const resetForm = () => {
     setFormData({
-      name: '',
+      name: "",
       price: 0,
-      description: '',
-      image: '',
-      category: 'best-seller',
+      description: "",
+      image: "",
+      category: "best-seller",
     });
     setEditingItem(null);
     setIsAddingNew(false);
     setSelectedFile(null);
-    setImagePreview('');
+    setImagePreview("");
   };
 
   if (isLoading) {
@@ -206,7 +215,10 @@ export default function AdminPage() {
             Admin Dashboard
           </h1>
           <div className="flex gap-4 items-center">
-            <Link href="/" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link
+              href="/"
+              className="text-blue-600 dark:text-blue-400 hover:underline"
+            >
               ← Back to Home
             </Link>
             <button
@@ -222,7 +234,11 @@ export default function AdminPage() {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {editingItem ? 'Edit Item' : isAddingNew ? 'Add New Item' : 'Item Management'}
+              {editingItem
+                ? "Edit Item"
+                : isAddingNew
+                  ? "Add New Item"
+                  : "Item Management"}
             </h2>
             {!isAddingNew && !editingItem && (
               <button
@@ -280,7 +296,7 @@ export default function AdminPage() {
                   />
                 </div>
 
-                {formData.category === 'sale' && (
+                {formData.category === "sale" && (
                   <>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -322,7 +338,9 @@ export default function AdminPage() {
                   />
                   {imagePreview && (
                     <div className="mt-3">
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Preview:</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        Preview:
+                      </p>
                       <img
                         src={imagePreview}
                         alt="Preview"
@@ -351,7 +369,7 @@ export default function AdminPage() {
                   type="submit"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
                 >
-                  {editingItem ? 'Update Item' : 'Add Item'}
+                  {editingItem ? "Update Item" : "Add Item"}
                 </button>
                 <button
                   type="button"
@@ -365,27 +383,69 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* All Items List */}
-        <div>
+        {/* Best Sellers List */}
+        <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            All Items ({items.length})
+            Best Sellers ({bestSellers.length})
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {items.map((item) => (
-              <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            {bestSellers.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-48 object-cover rounded-lg mb-3"
+                />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                  {item.name}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                  {item.description}
+                </p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-3">
+                  ${item.price}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(item)}
+                    className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded transition-colors text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors text-sm"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sale Items List */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Sale Items ({saleItems.length})
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {saleItems.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+              >
                 <div className="relative mb-3">
                   <img
                     src={item.image}
                     alt={item.name}
                     className="w-full h-48 object-cover rounded-lg"
                   />
-                  {item.category === 'sale' && item.discount && (
-                    <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
-                      {item.discount}% OFF
-                    </span>
-                  )}
-                  <span className="absolute top-2 left-2 bg-gray-800 text-white px-2 py-1 rounded text-xs font-bold">
-                    {item.category === 'best-seller' ? '🏆 Best Seller' : '🔥 Sale'}
+                  <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                    {item.discount}% OFF
                   </span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
@@ -395,12 +455,10 @@ export default function AdminPage() {
                   {item.description}
                 </p>
                 <div className="mb-3">
-                  {item.originalPrice && (
-                    <span className="text-sm text-gray-500 line-through mr-2">
-                      ${item.originalPrice}
-                    </span>
-                  )}
-                  <span className={`text-lg font-bold ${item.category === 'sale' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`}>
+                  <span className="text-sm text-gray-500 line-through mr-2">
+                    ${item.originalPrice}
+                  </span>
+                  <span className="text-lg font-bold text-red-600 dark:text-red-400">
                     ${item.price}
                   </span>
                 </div>
