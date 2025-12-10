@@ -3,13 +3,20 @@ import { readItemsData, writeItemsData } from '@/lib/data';
 
 export async function GET() {
   try {
+    console.log('[API] GET /api/items - Reading items data...');
     const data = readItemsData();
+    console.log('[API] Data read successfully:', {
+      bestSellersCount: data.bestSellers?.length || 0,
+      saleItemsCount: data.saleItems?.length || 0
+    });
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Failed to read data:', error);
+    console.error('[API] Failed to read data:', error);
     return NextResponse.json({
       error: 'Failed to read data',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown error',
+      bestSellers: [],
+      saleItems: []
     }, { status: 500 });
   }
 }

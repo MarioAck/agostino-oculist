@@ -50,12 +50,27 @@ export default function AdminPage() {
 
   const fetchItems = async () => {
     try {
+      console.log("Fetching items from /api/items...");
       const response = await fetch("/api/items");
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("API error:", errorData);
+        alert(`Failed to load items: ${errorData.error || "Unknown error"}`);
+        return;
+      }
+
       const data = await response.json();
+      console.log("Received data:", data);
+      console.log("Best sellers count:", data.bestSellers?.length || 0);
+      console.log("Sale items count:", data.saleItems?.length || 0);
+
       setBestSellers(data.bestSellers || []);
       setSaleItems(data.saleItems || []);
     } catch (error) {
       console.error("Failed to fetch items:", error);
+      alert("Failed to fetch items. Check console for details.");
     }
   };
 
