@@ -8,11 +8,12 @@ services:
     container_name: agostino-oculist
     ports:
       - "3000:3000"
-    volumes:
-      # Mount data directory to persist item changes
-      - ./app/data:/data
-      # Mount uploads directory to persist uploaded images
-      - ./app/public/uploads:/public/uploads
+    # No volumes - data and uploads stored inside container (ephemeral)
+    # Data will be lost on container restart/rebuild
+    # To enable persistence, uncomment and fix permissions:
+    # volumes:
+    #   - ./data:/app/data
+    #   - ./public/uploads:/app/public/uploads
     environment:
       - NODE_ENV=production
       - PORT=3000

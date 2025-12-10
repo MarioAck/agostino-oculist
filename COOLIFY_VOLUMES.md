@@ -1,17 +1,56 @@
-# Coolify Volume Permissions Fix
+# Coolify Storage Configuration
 
-## Problem
+## Current Setup (No Persistence)
 
-When deploying to Coolify with Docker volumes, the mounted `/app/data` directory may be owned by `root:root` (uid 0), but the Next.js application runs as the `nextjs` user (uid 1001). This causes permission errors when trying to read or write `items.json`.
+By default, the application stores data **inside the container** without volume mounts. This means:
+
+✅ **Pros:**
+- No permission issues
+- Works out of the box on Coolify
+- Simpler deployment
+
+❌ **Cons:**
+- **Data is lost** when container restarts or rebuilds
+- Uploaded images are lost on restart
+- Items added via admin panel are lost on restart
+
+## When to Use This
+
+Use the default (no volumes) setup if:
+- You're testing or developing
+- You rebuild your data from an external source
+- You don't need persistence between deployments
+
+---
+
+## Enabling Persistence (Advanced)
+
+If you need data to persist across container restarts:
+
+### Problem with Volumes
+
+When deploying to Coolify with Docker volumes, the mounted `/app/data` directory may be owned by `root:root` (uid 0), but the Next.js application runs as the `nextjs` user (uid 1001). This causes permission errors.
 
 Error you'll see:
 ```
-ENOENT: no such file or directory, open '/app/data/items.json'
+cp: can't create '/app/data/items.json': Permission denied
 ```
 
-## Solution Options
+## Solution to Enable Persistence
 
-### Option 1: Fix Permissions in Coolify (Recommended)
+### Step 1: Enable Volumes in docker-compose.yml
+
+Uncomment the volume lines in `docker-compose.yml`:
+
+```yaml
+volumes:
+  - ./data:/app/data
+  - ./public/uploads:/app/public/uploads
+```
+
+Commit and push the changes.
+
+### Step 2: Fix Permissions in Coolify
 
 After deploying to Coolify, run this command in the container terminal:
 
@@ -27,7 +66,7 @@ chmod -R 755 /app/data
 exit
 ```
 
-### Option 2: Pre-create the Volume Directory
+### Alternative: Pre-create the Volume Directory
 
 Before deploying, create the data directory on the host with correct permissions:
 
@@ -38,18 +77,6 @@ chown -R 1001:1001 /path/to/your/data
 chmod -R 755 /path/to/your/data
 ```
 
-### Option 3: Use Docker Compose Override
-
-In Coolify, you can set the volume mount options:
-
-```yaml
-volumes:
-  - ./data:/app/data:rw
-  - ./public/uploads:/app/public/uploads:rw
-
-# Add this to ensure proper ownership
-user: "1001:1001"  # Run container as nextjs user
-```
 
 ## Verification
 
