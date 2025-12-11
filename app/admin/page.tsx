@@ -22,6 +22,7 @@ export default function AdminPage() {
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [priceError, setPriceError] = useState<string>("");
 
   useEffect(() => {
     checkAuth();
@@ -80,13 +81,59 @@ export default function AdminPage() {
     >,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "price" || name === "originalPrice" || name === "discount"
-          ? Number(value)
-          : value,
-    }));
+    const numValue = Number(value);
+
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]:
+          name === "price" || name === "originalPrice" || name === "discount"
+            ? numValue
+            : value,
+      };
+
+      // Only calculate for sale items
+      if (prev.category === "sale") {
+        // If price and originalPrice are set, calculate discount
+        if (name === "price" && numValue >= 0 && updated.originalPrice && updated.originalPrice > 0) {
+          const calculatedDiscount = Math.round((1 - numValue / updated.originalPrice) * 100);
+          if (calculatedDiscount > 100) {
+            setPriceError("Original price is too low for this sale price");
+            updated.discount = 0;
+          } else {
+            setPriceError("");
+            updated.discount = calculatedDiscount;
+          }
+        } else if (name === "originalPrice" && numValue > 0 && updated.price && updated.price >= 0) {
+          const calculatedDiscount = Math.round((1 - updated.price / numValue) * 100);
+          if (calculatedDiscount > 100) {
+            setPriceError("Original price is too low for this sale price");
+            updated.discount = 0;
+          } else {
+            setPriceError("");
+            updated.discount = calculatedDiscount;
+          }
+        }
+        // If price and discount are set, calculate originalPrice
+        else if (name === "price" && numValue >= 0 && updated.discount != null && updated.discount !== 0) {
+          setPriceError("");
+          updated.originalPrice = Math.round((numValue / (1 - updated.discount / 100)) * 100) / 100;
+        } else if (name === "discount" && numValue !== 0 && updated.price && updated.price >= 0) {
+          setPriceError("");
+          updated.originalPrice = Math.round((updated.price / (1 - numValue / 100)) * 100) / 100;
+        }
+        // If originalPrice and discount are set, calculate price
+        else if (name === "originalPrice" && numValue > 0 && updated.discount != null && updated.discount !== 0) {
+          setPriceError("");
+          updated.price = Math.round(numValue * (1 - updated.discount / 100) * 100) / 100;
+        } else if (name === "discount" && numValue !== 0 && updated.originalPrice && updated.originalPrice > 0) {
+          setPriceError("");
+          updated.price = Math.round(updated.originalPrice * (1 - numValue / 100) * 100) / 100;
+        }
+      }
+
+      return updated;
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,8 +247,8 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="text-2xl font-semibold text-gray-900 dark:text-white">
+      <div className="min-h-screen bg-[#2d1810] flex flex-col items-center justify-center">
+        <div className="text-2xl font-semibold text-[#e8dcc4]">
           Loading...
         </div>
       </div>
@@ -213,50 +260,64 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-12">
-          <div>
-            <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-2">
-              Admin Dashboard
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
-              Manage your eyewear inventory
-            </p>
-          </div>
-          <div className="flex gap-4 items-center">
-            <Link
-              href="/"
-              className="text-purple-600 dark:text-purple-400 hover:underline font-medium"
-            >
-              ← Back to Home
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full transition-colors duration-200 font-semibold shadow-lg"
-            >
-              Logout
-            </button>
-          </div>
+    <div className="min-h-screen bg-[#2d1810] relative overflow-hidden flex flex-col">
+      {/* Textured Background Overlay */}
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
+          mixBlendMode: 'overlay'
+        }}
+      />
+
+      {/* Rust/Brown Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-red-900/20" />
+      {/* Header */}
+      <header className="relative z-10 w-full px-24 py-8 border-b border-[#e8dcc4]/10">
+        <div className="max-w-[1400px] mx-auto flex justify-between items-center">
+        <div>
+          <h1 className="text-5xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
+            ADMIN DASHBOARD
+          </h1>
+          <p className="text-xl text-[#e8dcc4]/80 tracking-wide">
+            Manage your eyewear inventory
+          </p>
         </div>
+        <div className="flex gap-4 items-center">
+          <Link
+            href="/"
+            className="text-[#e8dcc4] hover:text-white font-medium tracking-wide"
+          >
+            ← BACK TO HOME
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 py-2 rounded font-semibold tracking-wide hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300"
+          >
+            LOGOUT
+          </button>
+        </div>
+        </div>
+      </header>
+
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-24 py-16 flex-grow">
 
         {/* Add/Edit Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 mb-12">
+        <div className="bg-gradient-to-br from-[#1a1310]/90 to-[#2d1810]/90 backdrop-blur-sm rounded-lg shadow-2xl p-8 mb-12 border border-[#e8dcc4]/20">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold text-[#e8dcc4] tracking-wide">
               {editingItem
-                ? "Edit Item"
+                ? "EDIT ITEM"
                 : isAddingNew
-                  ? "Add New Item"
-                  : "Item Management"}
+                  ? "ADD NEW ITEM"
+                  : "ITEM MANAGEMENT"}
             </h2>
             {!isAddingNew && !editingItem && (
               <button
                 onClick={() => setIsAddingNew(true)}
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg transform hover:scale-105"
+                className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 py-3 rounded font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300"
               >
-                + Add New Item
+                + ADD NEW ITEM
               </button>
             )}
           </div>
@@ -265,8 +326,8 @@ export default function AdminPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Name
+                  <label className="block text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
+                    NAME
                   </label>
                   <input
                     type="text"
@@ -274,20 +335,20 @@ export default function AdminPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                     placeholder="Enter product name"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Category
+                  <label className="block text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
+                    CATEGORY
                   </label>
                   <select
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all"
                   >
                     <option value="best-seller">Best Seller</option>
                     <option value="sale">Sale</option>
@@ -295,8 +356,8 @@ export default function AdminPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Price ($)
+                  <label className="block text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
+                    PRICE ($)
                   </label>
                   <input
                     type="number"
@@ -305,7 +366,7 @@ export default function AdminPage() {
                     onChange={handleInputChange}
                     required
                     step="0.01"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                     placeholder="0.00"
                   />
                 </div>
@@ -313,8 +374,8 @@ export default function AdminPage() {
                 {formData.category === "sale" && (
                   <>
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                        Original Price ($)
+                      <label className="block text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
+                        ORIGINAL PRICE ($)
                       </label>
                       <input
                         type="number"
@@ -322,21 +383,31 @@ export default function AdminPage() {
                         value={formData.originalPrice || 0}
                         onChange={handleInputChange}
                         step="0.01"
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        className={`w-full px-4 py-3 border-2 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 transition-all placeholder-[#e8dcc4]/40 ${
+                          priceError
+                            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                            : "border-[#e8dcc4]/30 focus:ring-[#e8dcc4] focus:border-[#e8dcc4]"
+                        }`}
                         placeholder="0.00"
                       />
+                      {priceError && (
+                        <p className="mt-2 text-sm text-red-400">{priceError}</p>
+                      )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                        Discount (%)
+                      <label className="block text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
+                        DISCOUNT (%)
                       </label>
                       <input
                         type="number"
                         name="discount"
-                        value={formData.discount || 0}
+                        value={Math.round(formData.discount || 0)}
                         onChange={handleInputChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        step="1"
+                        min="0"
+                        max="100"
+                        className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                         placeholder="0"
                       />
                     </div>
@@ -344,21 +415,21 @@ export default function AdminPage() {
                 )}
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Product Image
+                  <label className="block text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
+                    PRODUCT IMAGE
                   </label>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-gray-600 dark:file:text-gray-200 file:cursor-pointer file:transition-all"
+                    className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] file:mr-4 file:py-2 file:px-6 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-[#e8dcc4] file:text-[#2d1810] hover:file:bg-[#f5ecd7] file:cursor-pointer file:transition-all"
                   />
                   {imagePreview && (
                     <div className="mt-4">
-                      <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                        Preview:
+                      <p className="text-sm font-semibold text-[#e8dcc4]/80 mb-2">
+                        PREVIEW:
                       </p>
-                      <div className="inline-block rounded-xl overflow-hidden border-4 border-purple-200 dark:border-purple-700 shadow-lg">
+                      <div className="inline-block rounded overflow-hidden border-4 border-[#e8dcc4]/30 shadow-lg">
                         <img
                           src={imagePreview}
                           alt="Preview"
@@ -371,15 +442,15 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Description
+                <label className="block text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
+                  DESCRIPTION
                 </label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                   placeholder="Enter product description"
                 />
               </div>
@@ -387,16 +458,16 @@ export default function AdminPage() {
               <div className="flex gap-4 pt-4">
                 <button
                   type="submit"
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg transform hover:scale-105"
+                  className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-8 py-3 rounded font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300"
                 >
-                  {editingItem ? "Update Item" : "Add Item"}
+                  {editingItem ? "UPDATE ITEM" : "ADD ITEM"}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg"
+                  className="border-2 border-[#e8dcc4]/50 text-[#e8dcc4]/70 px-8 py-3 rounded font-semibold tracking-wider hover:border-[#e8dcc4] hover:text-[#e8dcc4] transition-all duration-300"
                 >
-                  Cancel
+                  CANCEL
                 </button>
               </div>
             </form>
@@ -406,10 +477,10 @@ export default function AdminPage() {
         {/* Best Sellers Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
-              Best Sellers
+            <h2 className="text-4xl font-bold text-[#e8dcc4] tracking-wide">
+              BEST SELLERS
             </h2>
-            <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-lg font-semibold">
+            <span className="bg-[#e8dcc4] text-[#2d1810] px-4 py-1 rounded text-lg font-semibold">
               {bestSellers.length}
             </span>
           </div>
@@ -417,9 +488,9 @@ export default function AdminPage() {
             {bestSellers.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+                className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-[#e8dcc4]/10"
               >
-                <div className="relative aspect-square bg-gradient-to-br from-blue-100 to-blue-200 dark:from-gray-700 dark:to-gray-600">
+                <div className="relative aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50">
                   <img
                     src={item.image}
                     alt={item.name}
@@ -427,29 +498,29 @@ export default function AdminPage() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-2xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
                     {item.name}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 min-h-[48px]">
+                  <p className="text-[#e8dcc4]/70 mb-4 min-h-[48px] text-sm">
                     {item.description}
                   </p>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    <span className="text-2xl font-bold text-[#e8dcc4]">
                       ${item.price}
                     </span>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => handleEdit(item)}
-                      className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                      className="flex-1 border-2 border-[#e8dcc4] text-[#e8dcc4] px-4 py-2 rounded transition-all duration-200 font-semibold hover:bg-[#e8dcc4] hover:text-[#2d1810]"
                     >
-                      Edit
+                      EDIT
                     </button>
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                      className="flex-1 border-2 border-red-700 text-red-400 px-4 py-2 rounded transition-all duration-200 font-semibold hover:bg-red-700 hover:text-white"
                     >
-                      Delete
+                      DELETE
                     </button>
                   </div>
                 </div>
@@ -457,8 +528,8 @@ export default function AdminPage() {
             ))}
           </div>
           {bestSellers.length === 0 && (
-            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
+            <div className="text-center py-16 bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg shadow-lg border border-[#e8dcc4]/10">
+              <p className="text-[#e8dcc4]/70 text-lg">
                 No best sellers yet. Add your first item!
               </p>
             </div>
@@ -468,10 +539,10 @@ export default function AdminPage() {
         {/* Sale Items Section */}
         <div>
           <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white">
-              Sale Items
+            <h2 className="text-4xl font-bold text-[#e8dcc4] tracking-wide">
+              SALE ITEMS
             </h2>
-            <span className="bg-red-600 text-white px-4 py-1 rounded-full text-lg font-semibold">
+            <span className="bg-[#e8dcc4] text-[#2d1810] px-4 py-1 rounded text-lg font-semibold">
               {saleItems.length}
             </span>
           </div>
@@ -479,45 +550,45 @@ export default function AdminPage() {
             {saleItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+                className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-[#e8dcc4]/10"
               >
-                <div className="relative aspect-square bg-gradient-to-br from-red-100 to-orange-200 dark:from-gray-700 dark:to-gray-600">
+                <div className="relative aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50">
                   <img
                     src={item.image}
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                  <div className="absolute top-4 right-4 bg-[#e8dcc4] text-[#2d1810] px-3 py-1 rounded text-sm font-bold shadow-lg">
                     {item.discount}% OFF
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-2xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
                     {item.name}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 min-h-[48px]">
+                  <p className="text-[#e8dcc4]/70 mb-4 min-h-[48px] text-sm">
                     {item.description}
                   </p>
                   <div className="mb-4">
-                    <span className="text-lg text-gray-500 dark:text-gray-400 line-through mr-2">
+                    <span className="text-lg text-[#e8dcc4]/50 line-through mr-2">
                       ${item.originalPrice}
                     </span>
-                    <span className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    <span className="text-2xl font-bold text-[#e8dcc4]">
                       ${item.price}
                     </span>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => handleEdit(item)}
-                      className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                      className="flex-1 border-2 border-[#e8dcc4] text-[#e8dcc4] px-4 py-2 rounded transition-all duration-200 font-semibold hover:bg-[#e8dcc4] hover:text-[#2d1810]"
                     >
-                      Edit
+                      EDIT
                     </button>
                     <button
                       onClick={() => handleDelete(item.id)}
-                      className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition-colors duration-200 font-semibold shadow-md"
+                      className="flex-1 border-2 border-red-700 text-red-400 px-4 py-2 rounded transition-all duration-200 font-semibold hover:bg-red-700 hover:text-white"
                     >
-                      Delete
+                      DELETE
                     </button>
                   </div>
                 </div>
@@ -525,14 +596,33 @@ export default function AdminPage() {
             ))}
           </div>
           {saleItems.length === 0 && (
-            <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
+            <div className="text-center py-16 bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg shadow-lg border border-[#e8dcc4]/10">
+              <p className="text-[#e8dcc4]/70 text-lg">
                 No sale items yet. Add your first item!
               </p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="relative z-10 w-full px-24 py-12 border-t border-[#e8dcc4]/20">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-[#e8dcc4] tracking-wider">
+              AGOSTINO OCULIST
+            </h2>
+          </div>
+          <nav className="flex flex-wrap gap-6 md:gap-8 justify-center">
+            <a href="#privacy" className="text-[#e8dcc4] hover:text-white transition-colors text-sm tracking-wide">
+              PRIVACY POLICY
+            </a>
+            <a href="#terms" className="text-[#e8dcc4] hover:text-white transition-colors text-sm tracking-wide">
+              TERMS OF SERVICE
+            </a>
+          </nav>
+        </div>
+      </footer>
     </div>
   );
 }

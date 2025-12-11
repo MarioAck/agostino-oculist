@@ -37,22 +37,34 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen bg-[#2d1810] relative overflow-hidden flex flex-col items-center justify-center px-24">
+      {/* Textured Background Overlay */}
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
+          mixBlendMode: 'overlay'
+        }}
+      />
+
+      {/* Rust/Brown Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-red-900/20" />
+
+      <div className="max-w-md w-full relative z-10">
+        <div className="bg-gradient-to-br from-[#1a1310]/90 to-[#2d1810]/90 backdrop-blur-sm rounded-lg shadow-2xl p-8 border border-[#e8dcc4]/20">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Admin Login
+            <h1 className="text-3xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
+              ADMIN LOGIN
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-[#e8dcc4]/70">
               Enter your credentials to access the admin panel
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Username
+              <label htmlFor="username" className="block text-sm font-medium text-[#e8dcc4] mb-2 tracking-wide">
+                USERNAME
               </label>
               <input
                 id="username"
@@ -60,14 +72,14 @@ export default function AdminLogin() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                 placeholder="Enter username"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
+              <label htmlFor="password" className="block text-sm font-medium text-[#e8dcc4] mb-2 tracking-wide">
+                PASSWORD
               </label>
               <input
                 id="password"
@@ -75,13 +87,13 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                 placeholder="Enter password"
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
+              <div className="bg-red-900/30 border border-red-700 text-[#e8dcc4] px-4 py-3 rounded">
                 {error}
               </div>
             )}
@@ -89,20 +101,20 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+              className="w-full border-2 border-[#e8dcc4] text-[#e8dcc4] font-semibold py-3 px-4 rounded tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'LOGGING IN...' : 'LOGIN'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <Link href="/" className="text-blue-600 dark:text-blue-400 hover:underline">
-              ← Back to Home
+            <Link href="/" className="text-[#e8dcc4] hover:text-white transition-colors tracking-wide">
+              ← BACK TO HOME
             </Link>
           </div>
 
-          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+          <div className="mt-6 p-4 bg-[#1a1310]/50 rounded border border-[#e8dcc4]/10">
+            <p className="text-xs text-[#e8dcc4]/60 text-center">
               Default credentials: admin / admin123
             </p>
           </div>

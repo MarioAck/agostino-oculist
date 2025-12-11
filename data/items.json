@@ -50,7 +50,7 @@
     },
     {
       "name": "test",
-      "price": 0,
+      "price": 10,
       "description": "",
       "image": "/uploads/1765294964060-PEAK.jpg",
       "category": "best-seller",
@@ -117,6 +117,16 @@
       "description": "Stay ahead of trends",
       "image": "🕶️",
       "category": "sale"
+    },
+    {
+      "name": "asd",
+      "price": 12,
+      "description": "",
+      "image": "/uploads/1765472382603-PEAK.jpg",
+      "category": "sale",
+      "discount": 8,
+      "originalPrice": 13,
+      "id": "sale7"
     }
   ]
 }
