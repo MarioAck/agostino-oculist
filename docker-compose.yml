@@ -22,7 +22,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  data:
-  public/uploads:
