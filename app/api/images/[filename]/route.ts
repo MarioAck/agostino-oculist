@@ -5,10 +5,10 @@ import { existsSync } from 'fs';
 
 export async function GET(
   request: Request,
-  { params }: { params: { filename: string } }
+  { params }: { params: Promise<{ filename: string }> }
 ) {
   try {
-    const { filename } = params;
+    const { filename } = await params;
     console.log('[IMAGE] Image request received:', filename);
 
     // Construct the file path

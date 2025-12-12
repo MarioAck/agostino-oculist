@@ -9,7 +9,7 @@ services:
     # Persistent volumes for data and uploads
     volumes:
       - data:/app/data
-      - public/uploads:/app/public/uploads
+      - uploads:/app/public/uploads
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -22,3 +22,7 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  data:
+  uploads:
