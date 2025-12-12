@@ -23,6 +23,8 @@ export default function AdminPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [priceError, setPriceError] = useState<string>("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -190,17 +192,30 @@ export default function AdminPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this item?")) return;
+  const handleDelete = (id: string) => {
+    setItemToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
 
     try {
-      await fetch(`/api/items?id=${id}`, {
+      await fetch(`/api/items?id=${itemToDelete}`, {
         method: "DELETE",
       });
       fetchItems();
     } catch (error) {
       console.error("Failed to delete item:", error);
+    } finally {
+      setShowDeleteModal(false);
+      setItemToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setItemToDelete(null);
   };
 
   const resetForm = () => {
@@ -576,6 +591,34 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-[#1a1310]/95 to-[#2d1810]/95 backdrop-blur-md rounded-lg shadow-2xl p-8 max-w-md w-full mx-4 border-2 border-[#e8dcc4]/30">
+            <h3 className="text-2xl font-bold text-[#e8dcc4] mb-4 tracking-wide">
+              CONFIRM DELETE
+            </h3>
+            <p className="text-[#e8dcc4]/80 mb-8 text-lg">
+              Are you sure you want to delete this item? This action cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={confirmDelete}
+                className="flex-1 bg-red-700 hover:bg-red-600 text-white px-6 py-3 rounded font-semibold tracking-wider transition-all duration-300 border-2 border-red-700 hover:border-red-600"
+              >
+                DELETE
+              </button>
+              <button
+                onClick={cancelDelete}
+                className="flex-1 border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 py-3 rounded font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300"
+              >
+                CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="relative z-10 w-full px-24 py-12 border-t border-[#e8dcc4]/20">
