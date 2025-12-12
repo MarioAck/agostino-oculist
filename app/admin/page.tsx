@@ -94,36 +94,8 @@ export default function AdminPage() {
 
       // Only calculate for sale items
       if (prev.category === "sale") {
-        // If price and originalPrice are set, calculate discount
-        if (name === "price" && numValue >= 0 && updated.originalPrice && updated.originalPrice > 0) {
-          const calculatedDiscount = Math.round((1 - numValue / updated.originalPrice) * 100);
-          if (calculatedDiscount > 100) {
-            setPriceError("Original price is too low for this sale price");
-            updated.discount = 0;
-          } else {
-            setPriceError("");
-            updated.discount = calculatedDiscount;
-          }
-        } else if (name === "originalPrice" && numValue > 0 && updated.price && updated.price >= 0) {
-          const calculatedDiscount = Math.round((1 - updated.price / numValue) * 100);
-          if (calculatedDiscount > 100) {
-            setPriceError("Original price is too low for this sale price");
-            updated.discount = 0;
-          } else {
-            setPriceError("");
-            updated.discount = calculatedDiscount;
-          }
-        }
-        // If price and discount are set, calculate originalPrice
-        else if (name === "price" && numValue >= 0 && updated.discount != null && updated.discount !== 0) {
-          setPriceError("");
-          updated.originalPrice = Math.round((numValue / (1 - updated.discount / 100)) * 100) / 100;
-        } else if (name === "discount" && numValue !== 0 && updated.price && updated.price >= 0) {
-          setPriceError("");
-          updated.originalPrice = Math.round((updated.price / (1 - numValue / 100)) * 100) / 100;
-        }
-        // If originalPrice and discount are set, calculate price
-        else if (name === "originalPrice" && numValue > 0 && updated.discount != null && updated.discount !== 0) {
+        // If originalPrice and discount are set, calculate price only
+        if (name === "originalPrice" && numValue > 0 && updated.discount != null && updated.discount !== 0) {
           setPriceError("");
           updated.price = Math.round(numValue * (1 - updated.discount / 100) * 100) / 100;
         } else if (name === "discount" && numValue !== 0 && updated.originalPrice && updated.originalPrice > 0) {
