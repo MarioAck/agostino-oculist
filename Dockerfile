@@ -41,6 +41,9 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
+# Set proper ownership for data and uploads directories (will be created by app or volumes)
+RUN chown -R nextjs:nodejs /app 2>/dev/null || true
+
 # Switch to nextjs user
 USER nextjs
 

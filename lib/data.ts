@@ -19,8 +19,33 @@ export interface ItemsData {
 
 const dataFilePath = path.join(process.cwd(), "data", "items.json");
 
+function ensureDataFile(): void {
+  try {
+    // Ensure directory exists
+    const dataDir = path.dirname(dataFilePath);
+    if (!fs.existsSync(dataDir)) {
+      console.log('[DATA] Creating data directory:', dataDir);
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+
+    // Create file if it doesn't exist
+    if (!fs.existsSync(dataFilePath)) {
+      console.log('[DATA] Creating initial items.json file');
+      const initialData: ItemsData = { bestSellers: [], saleItems: [] };
+      fs.writeFileSync(dataFilePath, JSON.stringify(initialData, null, 2));
+      console.log('[DATA] items.json created successfully');
+    }
+  } catch (error) {
+    console.error('[DATA] Failed to ensure data file:', error);
+    throw error;
+  }
+}
+
 export function readItemsData(): ItemsData {
   try {
+    // Ensure file exists
+    ensureDataFile();
+
     console.log('[DATA] Reading from:', dataFilePath);
     console.log('[DATA] File exists:', fs.existsSync(dataFilePath));
 
@@ -53,6 +78,7 @@ export function writeItemsData(data: ItemsData): void {
     // Ensure directory exists
     const dataDir = path.dirname(dataFilePath);
     if (!fs.existsSync(dataDir)) {
+      console.log('[DATA] Creating data directory:', dataDir);
       fs.mkdirSync(dataDir, { recursive: true });
     }
 

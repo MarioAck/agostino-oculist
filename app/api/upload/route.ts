@@ -33,11 +33,7 @@ export async function POST(request: Request) {
 
     // Create uploads directory if it doesn't exist
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist, ignore error
-    }
+    await mkdir(uploadsDir, { recursive: true });
 
     // Save file
     const filepath = path.join(uploadsDir, filename);

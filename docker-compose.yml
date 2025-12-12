@@ -6,9 +6,7 @@ services:
     container_name: agostino-oculist
     ports:
       - "3000:3000"
-    # No volumes - data and uploads stored inside container (ephemeral)
-    # Data will be lost on container restart/rebuild
-    # To enable persistence, uncomment and fix permissions:
+    # Persistent volumes for data and uploads
     volumes:
       - data:/app/data
       - public/uploads:/app/public/uploads
@@ -24,3 +22,7 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  data:
+  public/uploads:
