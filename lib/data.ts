@@ -46,28 +46,12 @@ export function readItemsData(): ItemsData {
     // Ensure file exists
     ensureDataFile();
 
-    console.log('[DATA] Reading from:', dataFilePath);
-    console.log('[DATA] File exists:', fs.existsSync(dataFilePath));
-
     const fileContents = fs.readFileSync(dataFilePath, "utf8");
-    console.log('[DATA] File contents length:', fileContents.length);
-
     const parsedData = JSON.parse(fileContents);
-    console.log('[DATA] Parsed data structure:', {
-      hasBestSellers: Array.isArray(parsedData.bestSellers),
-      hasSaleItems: Array.isArray(parsedData.saleItems),
-      bestSellersCount: parsedData.bestSellers?.length || 0,
-      saleItemsCount: parsedData.saleItems?.length || 0
-    });
 
     return parsedData;
   } catch (error) {
     console.error("[DATA] Failed to read items data:", error);
-    console.error("[DATA] Error details:", {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      path: dataFilePath,
-      cwd: process.cwd()
-    });
     // Return empty arrays if file doesn't exist or can't be read
     return { bestSellers: [], saleItems: [] };
   }
