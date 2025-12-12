@@ -35,8 +35,6 @@ RUN adduser --system --uid 1001 nextjs
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# Copy public folder for serving static files in standalone mode
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Create directories with read/write permissions for all users before switching to nextjs user
 RUN mkdir -p /app/data /app/public/uploads && \
