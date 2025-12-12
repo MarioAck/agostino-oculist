@@ -1,13 +1,35 @@
-import Link from "next/link";
-import { readItemsData } from "@/lib/data";
+'use client';
 
-async function getBestSellers() {
-  const data = readItemsData();
-  return data.bestSellers;
+import Link from "next/link";
+import { useState, useEffect } from "react";
+
+interface Item {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+  category: string;
 }
 
-export default async function BestSellers() {
-  const bestSellers = await getBestSellers();
+export default function BestSellers() {
+  const [bestSellers, setBestSellers] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBestSellers() {
+      try {
+        const response = await fetch('/api/items?category=best-seller');
+        const data = await response.json();
+        setBestSellers(data);
+      } catch (error) {
+        console.error('Failed to fetch best sellers:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBestSellers();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#2d1810] relative overflow-hidden flex flex-col">
@@ -51,8 +73,13 @@ export default async function BestSellers() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mx-auto">
-          {bestSellers.map((item: any) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-[#e8dcc4] text-xl">Loading...</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mx-auto">
+            {bestSellers.map((item) => (
             <div
               key={item.id}
               className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-[#e8dcc4]/10 hover:border-[#e8dcc4]/30 transition-all duration-300 transform hover:-translate-y-2 shadow-xl hover:shadow-2xl"
@@ -81,8 +108,9 @@ export default async function BestSellers() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Footer */}
