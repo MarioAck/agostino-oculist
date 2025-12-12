@@ -9,9 +9,9 @@ services:
     # No volumes - data and uploads stored inside container (ephemeral)
     # Data will be lost on container restart/rebuild
     # To enable persistence, uncomment and fix permissions:
-    # volumes:
-    #   - ./data:/app/data
-    #   - ./public/uploads:/app/public/uploads
+    volumes:
+      - data:/app/data
+      - public/uploads:/app/public/uploads
     environment:
       - NODE_ENV=production
       - PORT=3000
