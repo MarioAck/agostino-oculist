@@ -29,21 +29,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy necessary files
-COPY --from=builder /app/public ./public
-
-# Create directories with proper permissions
-RUN mkdir -p .next public/uploads data
-
-# Set ownership for all directories
-RUN chown -R nextjs:nodejs .next public/uploads data
-
-# Ensure data directory is writable
-RUN chmod -R 755 data
-
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
