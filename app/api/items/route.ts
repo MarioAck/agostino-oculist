@@ -1,14 +1,28 @@
 import { NextResponse } from 'next/server';
 import { readItemsData, writeItemsData } from '@/lib/data';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+
     console.log('[API] GET /api/items - Reading items data...');
     const data = readItemsData();
     console.log('[API] Data read successfully:', {
       bestSellersCount: data.bestSellers?.length || 0,
       saleItemsCount: data.saleItems?.length || 0
     });
+
+    // If category filter is specified, return only that category
+    if (category === 'best-seller') {
+      console.log('[API] Filtering for best-seller category');
+      return NextResponse.json(data.bestSellers);
+    } else if (category === 'sale') {
+      console.log('[API] Filtering for sale category');
+      return NextResponse.json(data.saleItems);
+    }
+
+    // Otherwise return full data
     return NextResponse.json(data);
   } catch (error) {
     console.error('[API] Failed to read data:', error);
