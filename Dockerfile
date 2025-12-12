@@ -36,24 +36,17 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 
 # Create directories with proper permissions
-RUN mkdir -p .next public/uploads data data-template
-
-# Copy data to template location (survives volume mounts)
-COPY --from=builder /app/data/items.json ./data-template/items.json
+RUN mkdir -p .next public/uploads data
 
 # Set ownership for all directories
-RUN chown -R nextjs:nodejs .next public/uploads data data-template
+RUN chown -R nextjs:nodejs .next public/uploads data
 
 # Ensure data directory is writable
-RUN chmod -R 755 data data-template
+RUN chmod -R 755 data
 
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 3000
 
@@ -63,6 +56,4 @@ ENV HOSTNAME="0.0.0.0"
 # Switch to nextjs user
 USER nextjs
 
-# Use entrypoint to initialize data file, then start the app
-ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "server.js"]
