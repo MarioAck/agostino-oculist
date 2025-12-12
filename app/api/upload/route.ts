@@ -47,13 +47,13 @@ export async function POST(request: Request) {
     console.log('[UPLOAD] Writing file to:', filepath);
     await writeFile(filepath, buffer);
 
-    // Return the public URL
-    const publicUrl = `/uploads/${filename}`;
-    console.log('[UPLOAD] File uploaded successfully:', publicUrl);
+    // Return the API URL for serving the image with logging
+    const imageUrl = `/api/images/${filename}`;
+    console.log('[UPLOAD] File uploaded successfully, accessible at:', imageUrl);
 
     return NextResponse.json({
       success: true,
-      url: publicUrl,
+      url: imageUrl,
       filename: filename
     });
   } catch (error) {
