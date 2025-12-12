@@ -112,7 +112,7 @@ export default function NewSale() {
                   </span>
                 </div>
                 <button className="w-full border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 py-3 rounded font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300">
-                  BUY NOW
+                  VIEW
                 </button>
               </div>
             </div>
