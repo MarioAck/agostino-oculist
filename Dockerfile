@@ -36,13 +36,14 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Create directories with read/write permissions for all users before switching to nextjs user
+RUN mkdir -p /app/data /app/public/uploads && \
+    chmod -R 777 /app/data /app/public/uploads
+
 EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-
-# Set read and write permissions for data and uploads directories (will be created by app or volumes)
-RUN chmod -R 777 /app
 
 # Switch to nextjs user
 USER nextjs
