@@ -21,7 +21,7 @@ export default function AdminPage() {
     images: [],
     category: "best-seller",
   });
-  const [imageItems, setImageItems] = useState<Array<{ url: string; file?: File }>>([]);
+  const [imageItems, setImageItems] = useState<Array<{ url: string; file?: File; tempId?: string }>>([]);
   const [priceError, setPriceError] = useState<string>("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
@@ -111,18 +111,43 @@ export default function AdminPage() {
     });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
-      // Create previews for new files
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImageItems((prev) => [...prev, { url: reader.result as string, file }]);
-        };
-        reader.readAsDataURL(file);
-      });
+      // Upload files immediately and show optimized previews
+      for (const file of files) {
+        try {
+          // Show temporary loading preview
+          const tempId = `temp-${Date.now()}-${Math.random()}`;
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setImageItems((prev) => [...prev, { url: reader.result as string, file, tempId }]);
+          };
+          reader.readAsDataURL(file);
+
+          // Upload immediately
+          console.log('[Admin] Uploading file immediately:', file.name);
+          const uploadedUrl = await uploadImage(file);
+
+          // Replace temporary preview with optimized image
+          setImageItems((prev) =>
+            prev.map(item =>
+              item.tempId === tempId
+                ? { url: uploadedUrl } // Remove file and tempId, use server URL
+                : item
+            )
+          );
+        } catch (error) {
+          console.error('[Admin] Failed to upload file:', file.name, error);
+          alert(`Failed to upload ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          // Remove failed item
+          setImageItems((prev) => prev.filter(item => item.file !== file));
+        }
+      }
     }
+
+    // Clear input to allow re-uploading same file
+    e.target.value = '';
   };
 
   const removeImage = (index: number) => {
@@ -187,28 +212,15 @@ export default function AdminPage() {
         return;
       }
 
-      // Build final image URLs array
-      const finalImageUrls: string[] = [];
-
-      // Process each image item in order
-      for (let i = 0; i < imageItems.length; i++) {
-        const item = imageItems[i];
-        console.log(`[Admin] Processing image ${i + 1}/${imageItems.length}`, {
-          hasFile: !!item.file,
-          url: item.url.substring(0, 50)
-        });
-
-        if (item.file) {
-          // This is a new file that needs to be uploaded
-          console.log('[Admin] Uploading new file...');
-          const url = await uploadImage(item.file);
-          finalImageUrls.push(url);
-        } else {
-          // This is an existing URL
-          console.log('[Admin] Using existing URL');
-          finalImageUrls.push(item.url);
-        }
+      // Check if any images are still uploading
+      const hasUnuploadedFiles = imageItems.some(item => item.file || item.tempId);
+      if (hasUnuploadedFiles) {
+        alert("Please wait for all images to finish uploading");
+        return;
       }
+
+      // All images are already uploaded, just collect URLs
+      const finalImageUrls = imageItems.map(item => item.url);
 
       console.log('[Admin] Final image URLs:', finalImageUrls);
 
@@ -499,7 +511,7 @@ export default function AdminPage() {
                     className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] file:mr-3 md:file:mr-4 file:py-1 md:file:py-2 file:px-4 md:file:px-6 file:rounded file:border-0 file:text-xs md:file:text-sm file:font-semibold file:bg-[#e8dcc4] file:text-[#2d1810] hover:file:bg-[#f5ecd7] file:cursor-pointer file:transition-all"
                   />
                   <p className="text-xs text-[#e8dcc4]/60 mt-1">
-                    Drag images to reorder them. The first image will be the main image. Max 50MB per image. Images are automatically optimized and resized to 1920px max.
+                    Images upload immediately and are automatically optimized. Max 50MB, resized to 1920px. Drag to reorder.
                   </p>
                   {imageItems.length > 0 && (
                     <div className="mt-3 md:mt-4">
@@ -510,60 +522,73 @@ export default function AdminPage() {
                         {imageItems.map((item, index) => (
                           <div
                             key={index}
-                            draggable
+                            draggable={!item.tempId && !item.file}
                             onDragStart={() => handleDragStart(index)}
                             onDragOver={(e) => handleDragOver(e, index)}
                             onDragEnd={handleDragEnd}
-                            className={`relative rounded overflow-hidden border-2 border-[#e8dcc4]/30 shadow-lg cursor-move hover:border-[#e8dcc4]/60 transition-all ${
-                              draggedIndex === index ? "opacity-50" : ""
-                            }`}
+                            className={`relative rounded overflow-hidden border-2 border-[#e8dcc4]/30 shadow-lg transition-all ${
+                              item.tempId || item.file
+                                ? "cursor-wait opacity-60"
+                                : "cursor-move hover:border-[#e8dcc4]/60"
+                            } ${draggedIndex === index ? "opacity-50" : ""}`}
                           >
                             <img
                               src={item.url}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-32 md:h-40 object-cover"
                             />
-                            {index === 0 && (
+                            {(item.tempId || item.file) && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <div className="text-[#e8dcc4] text-xs font-bold">
+                                  Uploading...
+                                </div>
+                              </div>
+                            )}
+                            {index === 0 && !(item.tempId || item.file) && (
                               <div className="absolute top-1 left-1 bg-[#e8dcc4] text-[#2d1810] px-2 py-0.5 rounded text-xs font-bold">
                                 MAIN
                               </div>
                             )}
-                            <div className="absolute top-1 right-1 flex gap-1">
-                              {index > 0 && (
+                            {!(item.tempId || item.file) && (
+                              <>
+                                <div className="absolute top-1 right-1 flex gap-1">
+                                  {index > 0 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => moveImage(index, index - 1)}
+                                      className="bg-[#e8dcc4] text-[#2d1810] p-1 rounded hover:bg-[#f5ecd7] transition-all"
+                                      title="Move left"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                      </svg>
+                                    </button>
+                                  )}
+                                  {index < imageItems.length - 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => moveImage(index, index + 1)}
+                                      className="bg-[#e8dcc4] text-[#2d1810] p-1 rounded hover:bg-[#f5ecd7] transition-all"
+                                      title="Move right"
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                      </svg>
+                                    </button>
+                                  )}
+                                </div>
                                 <button
                                   type="button"
-                                  onClick={() => moveImage(index, index - 1)}
-                                  className="bg-[#e8dcc4] text-[#2d1810] p-1 rounded hover:bg-[#f5ecd7] transition-all"
-                                  title="Move left"
+                                  onClick={() => removeImage(index)}
+                                  className="absolute bottom-1 right-1 bg-red-700 text-white p-1 rounded hover:bg-red-600 transition-all"
+                                  title="Remove image"
                                 >
                                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                   </svg>
                                 </button>
-                              )}
-                              {index < imageItems.length - 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => moveImage(index, index + 1)}
-                                  className="bg-[#e8dcc4] text-[#2d1810] p-1 rounded hover:bg-[#f5ecd7] transition-all"
-                                  title="Move right"
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                  </svg>
-                                </button>
-                              )}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute bottom-1 right-1 bg-red-700 text-white p-1 rounded hover:bg-red-600 transition-all"
-                              title="Remove image"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
+                              </>
+                            )}
                           </div>
                         ))}
                       </div>
