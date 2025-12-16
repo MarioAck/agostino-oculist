@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import sharp from 'sharp';
 
 // Validate file type
 function validateFileType(file: File): boolean {
@@ -31,16 +32,53 @@ async function processFile(file: File, uploadsDir: string): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  // Generate unique filename
+  // Generate unique filename (change extension to .webp for optimized format)
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 8);
-  const originalName = file.name.replace(/\s+/g, '-');
-  const filename = `${timestamp}-${random}-${originalName}`;
+  const originalNameWithoutExt = path.parse(file.name.replace(/\s+/g, '-')).name;
+  const filename = `${timestamp}-${random}-${originalNameWithoutExt}.webp`;
 
-  // Save file
+  console.log('[UPLOAD] Original size:', (file.size / 1024).toFixed(2), 'KB');
+
+  // Process image with sharp
+  let processedBuffer: Buffer;
+
+  // Handle GIF separately (don't convert GIFs to WebP to preserve animation)
+  if (file.type === 'image/gif') {
+    const gifFilename = `${timestamp}-${random}-${originalNameWithoutExt}.gif`;
+    const filepath = path.join(uploadsDir, gifFilename);
+    console.log('[UPLOAD] Saving GIF without optimization');
+    await writeFile(filepath, buffer);
+
+    const imageUrl = `/api/images/${gifFilename}`;
+    console.log('[UPLOAD] GIF uploaded successfully, accessible at:', imageUrl);
+    return imageUrl;
+  }
+
+  try {
+    // Resize and optimize image
+    processedBuffer = await sharp(buffer)
+      .resize(1920, 1920, {
+        fit: 'inside', // Maintain aspect ratio, fit within dimensions
+        withoutEnlargement: true // Don't upscale smaller images
+      })
+      .webp({
+        quality: 85, // Good balance between quality and size
+        effort: 6 // Higher effort = better compression (0-6)
+      })
+      .toBuffer();
+
+    console.log('[UPLOAD] Optimized size:', (processedBuffer.length / 1024).toFixed(2), 'KB');
+    console.log('[UPLOAD] Size reduction:', ((1 - processedBuffer.length / file.size) * 100).toFixed(1), '%');
+  } catch (error) {
+    console.error('[UPLOAD] Image optimization failed:', error);
+    throw new Error(`Failed to optimize image: ${file.name}`);
+  }
+
+  // Save optimized file
   const filepath = path.join(uploadsDir, filename);
-  console.log('[UPLOAD] Writing file to:', filepath);
-  await writeFile(filepath, buffer);
+  console.log('[UPLOAD] Writing optimized file to:', filepath);
+  await writeFile(filepath, processedBuffer);
 
   // Return the API URL for serving the image
   const imageUrl = `/api/images/${filename}`;

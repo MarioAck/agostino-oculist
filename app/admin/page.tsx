@@ -499,7 +499,7 @@ export default function AdminPage() {
                     className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] file:mr-3 md:file:mr-4 file:py-1 md:file:py-2 file:px-4 md:file:px-6 file:rounded file:border-0 file:text-xs md:file:text-sm file:font-semibold file:bg-[#e8dcc4] file:text-[#2d1810] hover:file:bg-[#f5ecd7] file:cursor-pointer file:transition-all"
                   />
                   <p className="text-xs text-[#e8dcc4]/60 mt-1">
-                    Drag images to reorder them. The first image will be the main image. Max 50MB per image.
+                    Drag images to reorder them. The first image will be the main image. Max 50MB per image. Images are automatically optimized and resized to 1920px max.
                   </p>
                   {imageItems.length > 0 && (
                     <div className="mt-3 md:mt-4">

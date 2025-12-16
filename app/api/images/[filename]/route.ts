@@ -38,6 +38,7 @@ export async function GET(
       '.png': 'image/png',
       '.gif': 'image/gif',
       '.webp': 'image/webp',
+      '.svg': 'image/svg+xml',
     };
 
     const contentType = contentTypeMap[ext] || 'application/octet-stream';
