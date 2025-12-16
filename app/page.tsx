@@ -16,31 +16,31 @@ export default function Home() {
       <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-red-900/20" />
 
       {/* Header */}
-      <header className="relative z-10 w-full px-24 py-8">
+      <header className="relative z-10 w-full px-4 md:px-8 lg:px-24 py-6 md:py-8">
         <div className="max-w-[1400px] mx-auto flex justify-between items-center">
           <div>
             <Link href="/">
-              <h1 className="text-2xl md:text-3xl font-bold text-[#e8dcc4] tracking-wider hover:text-[#f5ecd7] transition-colors">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#e8dcc4] tracking-wider hover:text-[#f5ecd7] transition-colors">
                 AGOSTINO OCULIST
               </h1>
             </Link>
           </div>
-          <nav className="hidden md:flex gap-8">
+          <nav className="flex gap-4 md:gap-8">
           <Link
             href="/"
-            className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide"
+            className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-sm md:text-base"
           >
             HOME
           </Link>
           <Link
             href="/best-sellers"
-            className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide"
+            className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-sm md:text-base"
           >
             SHOP
           </Link>
           <a
             href="#contact"
-            className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide"
+            className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-sm md:text-base"
           >
             CONTACT
           </a>
@@ -49,29 +49,29 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 w-full max-w-[1400px] mx-auto px-24 py-12 flex-grow">
+      <main className="relative z-10 w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-24 py-8 md:py-12 flex-grow">
         {/* Hero Section 1 - New Arrivals (Best Sellers) */}
         <Link href="/best-sellers">
-          <section className="relative overflow-hidden rounded-lg bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm border border-[#e8dcc4]/10 cursor-pointer hover:border-[#e8dcc4]/30 transition-all duration-300 mb-6">
-            <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px] p-6 md:p-12">
+          <section className="relative overflow-hidden rounded-lg bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm border border-[#e8dcc4]/10 cursor-pointer hover:border-[#e8dcc4]/30 transition-all duration-300 mb-4 md:mb-6">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8 items-center min-h-[300px] md:min-h-[400px] p-6 md:p-12">
               {/* Left Content */}
-              <div className="text-left space-y-6">
-                <h2 className="text-5xl md:text-7xl font-bold text-[#e8dcc4] leading-tight tracking-wide">
+              <div className="text-left space-y-4 md:space-y-6">
+                <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold text-[#e8dcc4] leading-tight tracking-wide">
                   NEW
                   <br />
                   ARRIVALS
                 </h2>
-                <button className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-8 py-4 text-lg font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 rounded">
+                <button className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 rounded">
                   SHOP NOW
                 </button>
               </div>
 
               {/* Right Image Placeholder */}
               <div className="flex items-center justify-center">
-                <div className="relative w-full h-[320px] bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 rounded-lg flex items-center justify-center border border-[#e8dcc4]/20">
+                <div className="relative w-full h-[250px] md:h-[320px] bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 rounded-lg flex items-center justify-center border border-[#e8dcc4]/20">
                   <div className="text-center space-y-4">
-                    <div className="text-7xl">👓</div>
-                    <p className="text-[#e8dcc4]/60 text-sm">
+                    <div className="text-5xl md:text-7xl">👓</div>
+                    <p className="text-[#e8dcc4]/60 text-xs md:text-sm">
                       Best Sellers Collection
                     </p>
                   </div>
@@ -84,29 +84,29 @@ export default function Home() {
         {/* Hero Section 2 - 50% Off Sale */}
         <Link href="/new-sale">
           <section className="relative overflow-hidden rounded-lg bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm border border-[#e8dcc4]/10 cursor-pointer hover:border-[#e8dcc4]/30 transition-all duration-300">
-            <div className="grid md:grid-cols-2 gap-8 items-center min-h-[400px] p-6 md:p-12">
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8 items-center min-h-[300px] md:min-h-[400px] p-6 md:p-12">
               {/* Left Image Placeholder */}
               <div className="flex items-center justify-center order-2 md:order-1">
-                <div className="relative w-full h-[320px] bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 rounded-lg flex items-center justify-center border border-[#e8dcc4]/20">
+                <div className="relative w-full h-[250px] md:h-[320px] bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 rounded-lg flex items-center justify-center border border-[#e8dcc4]/20">
                   <div className="text-center space-y-4">
-                    <div className="text-7xl">🕶️</div>
-                    <p className="text-[#e8dcc4]/60 text-sm">Sale Collection</p>
+                    <div className="text-5xl md:text-7xl">🕶️</div>
+                    <p className="text-[#e8dcc4]/60 text-xs md:text-sm">Sale Collection</p>
                   </div>
                 </div>
               </div>
 
               {/* Right Content */}
-              <div className="text-left md:text-right space-y-6 order-1 md:order-2">
+              <div className="text-left md:text-right space-y-4 md:space-y-6 order-1 md:order-2">
                 <div>
-                  <h2 className="text-5xl md:text-7xl font-bold text-[#e8dcc4] leading-tight tracking-wide">
+                  <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold text-[#e8dcc4] leading-tight tracking-wide">
                     50% OFF
                   </h2>
-                  <p className="text-2xl md:text-3xl text-[#e8dcc4] mt-4 tracking-wider">
+                  <p className="text-xl md:text-2xl lg:text-3xl text-[#e8dcc4] mt-2 md:mt-4 tracking-wider">
                     SELECTED ITEMS
                   </p>
                 </div>
                 <div className="flex md:justify-end">
-                  <button className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-8 py-4 text-lg font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 rounded">
+                  <button className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 rounded">
                     SHOP SALE
                   </button>
                 </div>
@@ -117,23 +117,23 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 w-full px-24 py-12 border-t border-[#e8dcc4]/20">
-        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="relative z-10 w-full px-4 md:px-8 lg:px-24 py-8 md:py-12 border-t border-[#e8dcc4]/20">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#e8dcc4] tracking-wider">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#e8dcc4] tracking-wider">
               AGOSTINO OCULIST
             </h2>
           </div>
-          <nav className="flex flex-wrap gap-6 md:gap-8 justify-center">
+          <nav className="flex flex-wrap gap-4 md:gap-6 lg:gap-8 justify-center">
             <a
               href="#privacy"
-              className="text-[#e8dcc4] hover:text-white transition-colors text-sm tracking-wide"
+              className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide"
             >
               PRIVACY POLICY
             </a>
             <a
               href="#terms"
-              className="text-[#e8dcc4] hover:text-white transition-colors text-sm tracking-wide"
+              className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide"
             >
               TERMS OF SERVICE
             </a>

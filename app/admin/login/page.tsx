@@ -37,7 +37,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#2d1810] relative overflow-hidden flex flex-col items-center justify-center px-24">
+    <div className="min-h-screen bg-[#2d1810] relative overflow-hidden flex flex-col items-center justify-center px-4 md:px-8 lg:px-24">
       {/* Textured Background Overlay */}
       <div
         className="absolute inset-0 opacity-40"
@@ -51,19 +51,19 @@ export default function AdminLogin() {
       <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-red-900/20" />
 
       <div className="max-w-md w-full relative z-10">
-        <div className="bg-gradient-to-br from-[#1a1310]/90 to-[#2d1810]/90 backdrop-blur-sm rounded-lg shadow-2xl p-8 border border-[#e8dcc4]/20">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
+        <div className="bg-gradient-to-br from-[#1a1310]/90 to-[#2d1810]/90 backdrop-blur-sm rounded-lg shadow-2xl p-6 md:p-8 border border-[#e8dcc4]/20">
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
               ADMIN LOGIN
             </h1>
-            <p className="text-[#e8dcc4]/70">
+            <p className="text-[#e8dcc4]/70 text-sm md:text-base">
               Enter your credentials to access the admin panel
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-[#e8dcc4] mb-2 tracking-wide">
+              <label htmlFor="username" className="block text-xs md:text-sm font-medium text-[#e8dcc4] mb-2 tracking-wide">
                 USERNAME
               </label>
               <input
@@ -72,13 +72,13 @@ export default function AdminLogin() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
+                className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                 placeholder="Enter username"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#e8dcc4] mb-2 tracking-wide">
+              <label htmlFor="password" className="block text-xs md:text-sm font-medium text-[#e8dcc4] mb-2 tracking-wide">
                 PASSWORD
               </label>
               <input
@@ -87,13 +87,13 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
+                className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
                 placeholder="Enter password"
               />
             </div>
 
             {error && (
-              <div className="bg-red-900/30 border border-red-700 text-[#e8dcc4] px-4 py-3 rounded">
+              <div className="bg-red-900/30 border border-red-700 text-[#e8dcc4] px-3 md:px-4 py-2 md:py-3 rounded text-sm md:text-base">
                 {error}
               </div>
             )}
@@ -101,19 +101,19 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full border-2 border-[#e8dcc4] text-[#e8dcc4] font-semibold py-3 px-4 rounded tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full border-2 border-[#e8dcc4] text-[#e8dcc4] font-semibold py-2 md:py-3 px-4 rounded tracking-wider text-sm md:text-base hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'LOGGING IN...' : 'LOGIN'}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <Link href="/" className="text-[#e8dcc4] hover:text-white transition-colors tracking-wide">
+          <div className="mt-4 md:mt-6 text-center">
+            <Link href="/" className="text-[#e8dcc4] hover:text-white transition-colors tracking-wide text-sm md:text-base">
               ← BACK TO HOME
             </Link>
           </div>
 
-          <div className="mt-6 p-4 bg-[#1a1310]/50 rounded border border-[#e8dcc4]/10">
+          <div className="mt-4 md:mt-6 p-3 md:p-4 bg-[#1a1310]/50 rounded border border-[#e8dcc4]/10">
             <p className="text-xs text-[#e8dcc4]/60 text-center">
               Default credentials: admin / admin123
             </p>

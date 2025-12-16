@@ -8,7 +8,8 @@ export interface Item {
   originalPrice?: number;
   discount?: number;
   description: string;
-  image: string;
+  image: string; // Kept for backward compatibility, will be first image in images array
+  images: string[]; // Array of image URLs
   category: "best-seller" | "sale";
 }
 
