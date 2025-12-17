@@ -709,6 +709,12 @@ export default function AdminPage() {
                     </span>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+                    <Link
+                      href={`/item/${item.id}`}
+                      className="flex-1 border-2 border-[#e8dcc4]/50 text-[#e8dcc4] px-3 md:px-4 py-2 rounded transition-all duration-200 font-semibold text-sm md:text-base hover:bg-[#e8dcc4]/10 hover:border-[#e8dcc4] text-center"
+                    >
+                      VIEW
+                    </Link>
                     <button
                       onClick={() => handleEdit(item)}
                       className="flex-1 border-2 border-[#e8dcc4] text-[#e8dcc4] px-3 md:px-4 py-2 rounded transition-all duration-200 font-semibold text-sm md:text-base hover:bg-[#e8dcc4] hover:text-[#2d1810]"
@@ -782,6 +788,12 @@ export default function AdminPage() {
                     </span>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+                    <Link
+                      href={`/item/${item.id}`}
+                      className="flex-1 border-2 border-[#e8dcc4]/50 text-[#e8dcc4] px-3 md:px-4 py-2 rounded transition-all duration-200 font-semibold text-sm md:text-base hover:bg-[#e8dcc4]/10 hover:border-[#e8dcc4] text-center"
+                    >
+                      VIEW
+                    </Link>
                     <button
                       onClick={() => handleEdit(item)}
                       className="flex-1 border-2 border-[#e8dcc4] text-[#e8dcc4] px-3 md:px-4 py-2 rounded transition-all duration-200 font-semibold text-sm md:text-base hover:bg-[#e8dcc4] hover:text-[#2d1810]"
