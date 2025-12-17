@@ -256,10 +256,8 @@ export default function AdminPage() {
           throw new Error(error.error || 'Failed to update item');
         }
       } else {
-        const categoryItems =
-          formData.category === "best-seller" ? bestSellers : saleItems;
-        const prefix = formData.category === "best-seller" ? "bs" : "sale";
-        const newId = `${prefix}${categoryItems.length + 1}`;
+        // Generate a unique UUID for the new item
+        const newId = crypto.randomUUID();
 
         const response = await fetch("/api/items", {
           method: "POST",
@@ -520,7 +518,7 @@ export default function AdminPage() {
                   />
 
                   <p className="text-xs text-[#e8dcc4]/60 mb-3">
-                    Click the + button to add images. Images upload immediately and are automatically optimized to 500x500px. Max 50MB. Drag to reorder.
+                    Click the + button to add images. Images upload immediately and are automatically optimized to 2000x2000px high-quality WebP (up to ~5MB). Max 50MB upload. Drag to reorder.
                   </p>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">

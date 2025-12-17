@@ -56,19 +56,19 @@ async function processFile(file: File, uploadsDir: string): Promise<string> {
   }
 
   try {
-    // Resize to exactly 500x500 and optimize image
+    // Resize to exactly 2000x2000 for high-quality images (up to ~5MB)
     processedBuffer = await sharp(buffer)
-      .resize(500, 500, {
+      .resize(2000, 2000, {
         fit: 'cover', // Crop to fill dimensions, maintaining aspect ratio
         position: 'center' // Center the crop
       })
       .webp({
-        quality: 85, // Good balance between quality and size
+        quality: 95, // High quality for better detail (allows larger file sizes)
         effort: 6 // Higher effort = better compression (0-6)
       })
       .toBuffer();
 
-    console.log('[UPLOAD] Resized to: 500x500px');
+    console.log('[UPLOAD] Resized to: 2000x2000px');
     console.log('[UPLOAD] Optimized size:', (processedBuffer.length / 1024).toFixed(2), 'KB');
     console.log('[UPLOAD] Size reduction:', ((1 - processedBuffer.length / file.size) * 100).toFixed(1), '%');
   } catch (error) {
