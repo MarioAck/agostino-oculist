@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Item } from "@/lib/data";
@@ -26,6 +26,7 @@ export default function AdminPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     checkAuth();
@@ -175,6 +176,10 @@ export default function AdminPage() {
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
 
   const uploadImage = async (file: File): Promise<string> => {
@@ -503,23 +508,42 @@ export default function AdminPage() {
                   <label className="block text-xs md:text-sm font-semibold text-[#e8dcc4] mb-2 tracking-wide">
                     PRODUCT IMAGES
                   </label>
+
+                  {/* Hidden file input */}
                   <input
+                    ref={fileInputRef}
                     type="file"
                     accept="image/*"
                     multiple
                     onChange={handleFileChange}
-                    className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] file:mr-3 md:file:mr-4 file:py-1 md:file:py-2 file:px-4 md:file:px-6 file:rounded file:border-0 file:text-xs md:file:text-sm file:font-semibold file:bg-[#e8dcc4] file:text-[#2d1810] hover:file:bg-[#f5ecd7] file:cursor-pointer file:transition-all"
+                    className="hidden"
                   />
-                  <p className="text-xs text-[#e8dcc4]/60 mt-1">
-                    Images upload immediately and are automatically optimized. Max 50MB, resized to 1920px. Drag to reorder.
+
+                  <p className="text-xs text-[#e8dcc4]/60 mb-3">
+                    Click the + button to add images. Images upload immediately and are automatically optimized to 500x500px. Max 50MB. Drag to reorder.
                   </p>
-                  {imageItems.length > 0 && (
-                    <div className="mt-3 md:mt-4">
-                      <p className="text-xs md:text-sm font-semibold text-[#e8dcc4]/80 mb-2">
-                        IMAGES ({imageItems.length}):
-                      </p>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
-                        {imageItems.map((item, index) => (
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+                    {/* Add Image Button - Shows at start if no images */}
+                    {imageItems.length === 0 && (
+                      <button
+                        type="button"
+                        onClick={triggerFileInput}
+                        className="relative aspect-square rounded overflow-hidden border-2 border-dashed border-[#e8dcc4]/30 hover:border-[#e8dcc4]/60 transition-all duration-300 bg-gradient-to-br from-[#1a1310]/50 to-[#2d1810]/50 hover:from-[#1a1310]/70 hover:to-[#2d1810]/70 cursor-pointer group"
+                      >
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                          <svg className="w-12 h-12 text-[#e8dcc4]/50 group-hover:text-[#e8dcc4]/80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          <span className="text-[#e8dcc4]/70 group-hover:text-[#e8dcc4] text-xs md:text-sm font-semibold tracking-wide transition-colors">
+                            ADD IMAGES
+                          </span>
+                        </div>
+                      </button>
+                    )}
+
+                    {/* Image previews */}
+                    {imageItems.map((item, index) => (
                           <div
                             key={index}
                             draggable={!item.tempId && !item.file}
@@ -591,9 +615,25 @@ export default function AdminPage() {
                             )}
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  )}
+
+                    {/* Add More Images Button - Shows at end of list */}
+                    {imageItems.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={triggerFileInput}
+                        className="relative aspect-square rounded overflow-hidden border-2 border-dashed border-[#e8dcc4]/30 hover:border-[#e8dcc4]/60 transition-all duration-300 bg-gradient-to-br from-[#1a1310]/50 to-[#2d1810]/50 hover:from-[#1a1310]/70 hover:to-[#2d1810]/70 cursor-pointer group"
+                      >
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                          <svg className="w-12 h-12 text-[#e8dcc4]/50 group-hover:text-[#e8dcc4]/80 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          <span className="text-[#e8dcc4]/70 group-hover:text-[#e8dcc4] text-xs md:text-sm font-semibold tracking-wide transition-colors">
+                            ADD MORE
+                          </span>
+                        </div>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 
