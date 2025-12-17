@@ -548,7 +548,7 @@ export default function AdminPage() {
                             onDragStart={() => handleDragStart(index)}
                             onDragOver={(e) => handleDragOver(e, index)}
                             onDragEnd={handleDragEnd}
-                            className={`relative rounded overflow-hidden border-2 border-[#e8dcc4]/30 shadow-lg transition-all ${
+                            className={`relative aspect-square rounded overflow-hidden border-2 border-[#e8dcc4]/30 shadow-lg transition-all ${
                               item.tempId || item.file
                                 ? "cursor-wait opacity-60"
                                 : "cursor-move hover:border-[#e8dcc4]/60"
@@ -557,7 +557,7 @@ export default function AdminPage() {
                             <img
                               src={item.url}
                               alt={`Preview ${index + 1}`}
-                              className="w-full h-32 md:h-40 object-cover"
+                              className="w-full h-full object-cover"
                             />
                             {(item.tempId || item.file) && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
