@@ -697,12 +697,9 @@ export default function AdminPage() {
                   )}
                 </div>
                 <div className="p-4 md:p-6">
-                  <h3 className="text-xl md:text-2xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
+                  <h3 className="text-xl md:text-2xl font-bold text-[#e8dcc4] mb-4 md:mb-6 tracking-wide">
                     {item.name}
                   </h3>
-                  <p className="text-[#e8dcc4]/70 mb-3 md:mb-4 min-h-[40px] md:min-h-[48px] text-xs md:text-sm whitespace-pre-wrap">
-                    {item.description}
-                  </p>
                   <div className="flex items-center justify-between mb-3 md:mb-4">
                     <span className="text-xl md:text-2xl font-bold text-[#e8dcc4]">
                       ${item.price}
@@ -773,12 +770,9 @@ export default function AdminPage() {
                   )}
                 </div>
                 <div className="p-4 md:p-6">
-                  <h3 className="text-xl md:text-2xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
+                  <h3 className="text-xl md:text-2xl font-bold text-[#e8dcc4] mb-4 md:mb-6 tracking-wide">
                     {item.name}
                   </h3>
-                  <p className="text-[#e8dcc4]/70 mb-3 md:mb-4 min-h-[40px] md:min-h-[48px] text-xs md:text-sm whitespace-pre-wrap">
-                    {item.description}
-                  </p>
                   <div className="mb-3 md:mb-4">
                     <span className="text-base md:text-lg text-[#e8dcc4]/50 line-through mr-2">
                       ${item.originalPrice}
