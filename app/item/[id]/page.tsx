@@ -24,6 +24,7 @@ export default function ItemPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
 
   // Minimum swipe distance (in px) to trigger navigation
   const minSwipeDistance = 50;
@@ -69,11 +70,15 @@ export default function ItemPage() {
   const images = item.images && item.images.length > 0 ? item.images : [item.image];
 
   const nextImage = () => {
+    setSlideDirection('left');
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setTimeout(() => setSlideDirection(null), 500);
   };
 
   const prevImage = () => {
+    setSlideDirection('right');
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setTimeout(() => setSlideDirection(null), 500);
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -141,15 +146,23 @@ export default function ItemPage() {
           <div className="space-y-4">
             <div className="relative bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-[#e8dcc4]/10 shadow-2xl">
               <div
-                className="aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 flex items-center justify-center relative"
+                className="aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 flex items-center justify-center relative overflow-hidden"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
               >
                 <img
+                  key={currentImageIndex}
                   src={images[currentImageIndex]}
                   alt={`${item.name} - Image ${currentImageIndex + 1}`}
                   className="w-full h-full object-cover"
+                  style={{
+                    animation: slideDirection
+                      ? slideDirection === 'left'
+                        ? 'slideInFromRight 0.5s ease-out'
+                        : 'slideInFromLeft 0.5s ease-out'
+                      : 'none'
+                  }}
                 />
                 {isOnSale && item.discount && (
                   <div className="absolute top-3 right-3 md:top-6 md:right-6 bg-[#e8dcc4] text-[#2d1810] px-3 py-1.5 md:px-6 md:py-3 rounded font-bold text-sm md:text-lg shadow-lg tracking-wide z-10">
