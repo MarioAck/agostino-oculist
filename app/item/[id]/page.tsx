@@ -24,7 +24,9 @@ export default function ItemPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Minimum swipe distance (in px) to trigger navigation
   const minSwipeDistance = 50;
@@ -69,39 +71,76 @@ export default function ItemPage() {
   const isOnSale = item.category === 'sale';
   const images = item.images && item.images.length > 0 ? item.images : [item.image];
 
+  // Get previous, current, and next image indices
+  const prevImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+  const nextImageIndex = (currentImageIndex + 1) % images.length;
+
   const nextImage = () => {
-    setSlideDirection('left');
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    setTimeout(() => setSlideDirection(null), 500);
+    setTimeout(() => setIsTransitioning(false), 500);
   };
 
   const prevImage = () => {
-    setSlideDirection('right');
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-    setTimeout(() => setSlideDirection(null), 500);
+    setTimeout(() => setIsTransitioning(false), 500);
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
+    if (isTransitioning) return;
     setTouchStart(e.targetTouches[0].clientX);
+    setTouchEnd(e.targetTouches[0].clientX);
+    setIsDragging(true);
+    setDragOffset(0);
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (!isDragging || !touchStart) return;
+    const currentTouch = e.targetTouches[0].clientX;
+    const offset = currentTouch - touchStart;
+    setTouchEnd(currentTouch);
+    setDragOffset(offset);
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!touchStart || !touchEnd) {
+      setIsDragging(false);
+      setDragOffset(0);
+      return;
+    }
 
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
+    setIsDragging(false);
+
     if (isLeftSwipe) {
-      nextImage();
+      // Complete the transition to next image
+      setIsTransitioning(true);
+      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setDragOffset(0);
+      }, 300);
     } else if (isRightSwipe) {
-      prevImage();
+      // Complete the transition to previous image
+      setIsTransitioning(true);
+      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setDragOffset(0);
+      }, 300);
+    } else {
+      // Snap back to current position
+      setDragOffset(0);
     }
+
+    setTouchStart(null);
+    setTouchEnd(null);
   };
 
   return (
@@ -146,24 +185,46 @@ export default function ItemPage() {
           <div className="space-y-4">
             <div className="relative bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-[#e8dcc4]/10 shadow-2xl">
               <div
-                className="aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 flex items-center justify-center relative overflow-hidden"
+                className="aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 relative overflow-hidden"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
               >
-                <img
-                  key={currentImageIndex}
-                  src={images[currentImageIndex]}
-                  alt={`${item.name} - Image ${currentImageIndex + 1}`}
-                  className="w-full h-full object-cover"
+                {/* Image container that slides */}
+                <div
+                  className="absolute inset-0 flex"
                   style={{
-                    animation: slideDirection
-                      ? slideDirection === 'left'
-                        ? 'slideInFromRight 0.5s ease-out'
-                        : 'slideInFromLeft 0.5s ease-out'
-                      : 'none'
+                    transform: `translateX(calc(-100% + ${dragOffset}px))`,
+                    transition: isDragging ? 'none' : 'transform 0.3s ease-out',
                   }}
-                />
+                >
+                  {/* Previous Image */}
+                  <div className="w-full h-full flex-shrink-0">
+                    <img
+                      src={images[prevImageIndex]}
+                      alt={`Previous image`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Current Image */}
+                  <div className="w-full h-full flex-shrink-0 relative">
+                    <img
+                      src={images[currentImageIndex]}
+                      alt={`${item.name} - Image ${currentImageIndex + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Next Image */}
+                  <div className="w-full h-full flex-shrink-0">
+                    <img
+                      src={images[nextImageIndex]}
+                      alt={`Next image`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
                 {isOnSale && item.discount && (
                   <div className="absolute top-3 right-3 md:top-6 md:right-6 bg-[#e8dcc4] text-[#2d1810] px-3 py-1.5 md:px-6 md:py-3 rounded font-bold text-sm md:text-lg shadow-lg tracking-wide z-10">
                     {item.discount}% OFF
