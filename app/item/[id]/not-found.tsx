@@ -16,17 +16,17 @@ export default function NotFound() {
       <div className="absolute inset-0 bg-gradient-to-br from-amber-900/20 via-transparent to-red-900/20" />
 
       {/* Header */}
-      <header className="relative z-10 w-full px-6 md:px-24 py-8">
+      <header className="relative z-10 w-full px-4 md:px-12 lg:px-24 py-6 md:py-8">
         <div className="max-w-[1400px] mx-auto flex justify-between items-center">
           <div>
             <Link href="/">
-              <h1 className="text-2xl md:text-3xl font-bold text-[#e8dcc4] tracking-wider hover:text-[#f5ecd7] transition-colors">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#e8dcc4] tracking-wider hover:text-[#f5ecd7] transition-colors">
                 AGOSTINO OCULIST
               </h1>
             </Link>
           </div>
-          <nav className="flex gap-4 md:gap-6">
-            <Link href="/" className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-sm md:text-base">
+          <nav className="flex gap-3 md:gap-6">
+            <Link href="/" className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-xs md:text-sm lg:text-base">
               HOME
             </Link>
           </nav>
@@ -34,11 +34,11 @@ export default function NotFound() {
       </header>
 
       {/* Main Content */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 md:px-24 py-12 flex-grow flex items-center justify-center">
-        <div className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg p-8 md:p-12 border border-[#e8dcc4]/10 shadow-2xl text-center max-w-2xl">
-          <div className="mb-8">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 md:px-12 lg:px-24 py-6 md:py-12 flex-grow flex items-center justify-center">
+        <div className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg p-6 md:p-8 lg:p-12 border border-[#e8dcc4]/10 shadow-2xl text-center max-w-2xl w-full">
+          <div className="mb-6 md:mb-8">
             <svg
-              className="w-24 h-24 mx-auto text-[#e8dcc4]/50"
+              className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 mx-auto text-[#e8dcc4]/50"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -52,24 +52,24 @@ export default function NotFound() {
             </svg>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-[#e8dcc4] mb-6 tracking-wide">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#e8dcc4] mb-4 md:mb-6 tracking-wide">
             ITEM NOT FOUND
           </h1>
 
-          <p className="text-[#e8dcc4]/80 text-lg md:text-xl mb-8 leading-relaxed">
+          <p className="text-[#e8dcc4]/80 text-sm md:text-base lg:text-xl mb-6 md:mb-8 leading-relaxed">
             Sorry, we couldn't find the item you're looking for. It may have been removed or the link might be incorrect.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center">
             <Link
               href="/"
-              className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-8 py-3 rounded-lg font-bold text-lg tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 shadow-lg"
+              className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 py-2.5 md:px-8 md:py-3 rounded-lg font-bold text-base md:text-lg tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 shadow-lg"
             >
               GO HOME
             </Link>
             <Link
               href="/best-sellers"
-              className="border-2 border-[#e8dcc4]/50 text-[#e8dcc4]/80 px-8 py-3 rounded-lg font-bold text-lg tracking-wider hover:border-[#e8dcc4] hover:text-[#e8dcc4] transition-all duration-300"
+              className="border-2 border-[#e8dcc4]/50 text-[#e8dcc4]/80 px-6 py-2.5 md:px-8 md:py-3 rounded-lg font-bold text-base md:text-lg tracking-wider hover:border-[#e8dcc4] hover:text-[#e8dcc4] transition-all duration-300"
             >
               VIEW BEST SELLERS
             </Link>
@@ -78,18 +78,18 @@ export default function NotFound() {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 w-full px-6 md:px-24 py-12 mt-12 border-t border-[#e8dcc4]/20">
-        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="relative z-10 w-full px-4 md:px-12 lg:px-24 py-8 md:py-12 mt-8 md:mt-12 border-t border-[#e8dcc4]/20">
+        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#e8dcc4] tracking-wider">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#e8dcc4] tracking-wider">
               AGOSTINO OCULIST
             </h2>
           </div>
-          <nav className="flex flex-wrap gap-6 md:gap-8 justify-center">
-            <a href="#privacy" className="text-[#e8dcc4] hover:text-white transition-colors text-sm tracking-wide">
+          <nav className="flex flex-wrap gap-4 md:gap-6 lg:gap-8 justify-center">
+            <a href="#privacy" className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide">
               PRIVACY POLICY
             </a>
-            <a href="#terms" className="text-[#e8dcc4] hover:text-white transition-colors text-sm tracking-wide">
+            <a href="#terms" className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide">
               TERMS OF SERVICE
             </a>
           </nav>
