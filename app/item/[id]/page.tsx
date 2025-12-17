@@ -213,7 +213,7 @@ export default function ItemPage() {
               <h2 className="text-2xl font-bold text-[#e8dcc4] mb-4 tracking-wide">
                 Description
               </h2>
-              <p className="text-[#e8dcc4]/80 text-lg leading-relaxed">
+              <p className="text-[#e8dcc4]/80 text-lg leading-relaxed whitespace-pre-wrap">
                 {item.description}
               </p>
             </div>

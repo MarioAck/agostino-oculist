@@ -97,7 +97,7 @@ export default function BestSellers() {
                 <h3 className="text-xl md:text-2xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
                   {item.name}
                 </h3>
-                <p className="text-[#e8dcc4]/70 mb-3 md:mb-4 text-xs md:text-sm">
+                <p className="text-[#e8dcc4]/70 mb-3 md:mb-4 text-xs md:text-sm whitespace-pre-wrap">
                   {item.description}
                 </p>
                 <div className="mb-3 md:mb-4">
