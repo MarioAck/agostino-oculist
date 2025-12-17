@@ -69,16 +69,16 @@ export default function NewSale() {
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-24 py-8 md:py-12 flex-grow">
         <div className="text-center mb-8 md:mb-12">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-[#e8dcc4] mb-3 md:mb-4 tracking-wide">
-            50% OFF SALE
+            SALDI 50% OFF
           </h1>
           <p className="text-base md:text-xl text-[#e8dcc4]/80 tracking-wide">
-            Limited time offers on premium eyewear
+            Offerte a tempo limitato su occhiali premium
           </p>
         </div>
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-[#e8dcc4] text-xl">Loading...</p>
+            <p className="text-[#e8dcc4] text-xl">Caricamento...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8 mx-auto">
@@ -111,7 +111,7 @@ export default function NewSale() {
                   </span>
                 </div>
                 <button className="w-full border-2 border-[#e8dcc4] text-[#e8dcc4] px-4 md:px-6 py-2 md:py-3 rounded font-semibold tracking-wide text-sm md:text-base hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300">
-                  VIEW
+                  VISUALIZZA
                 </button>
               </div>
             </Link>
@@ -130,10 +130,10 @@ export default function NewSale() {
           </div>
           <nav className="flex flex-wrap gap-4 md:gap-6 lg:gap-8 justify-center">
             <a href="#privacy" className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide">
-              PRIVACY POLICY
+              PRIVACY
             </a>
             <a href="#terms" className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide">
-              TERMS OF SERVICE
+              TERMINI DI SERVIZIO
             </a>
           </nav>
         </div>

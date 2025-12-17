@@ -36,13 +36,13 @@ export default function Home() {
             href="/best-sellers"
             className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-sm md:text-base"
           >
-            SHOP
+            NEGOZIO
           </Link>
           <a
             href="#contact"
             className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-sm md:text-base"
           >
-            CONTACT
+            CONTATTI
           </a>
         </nav>
         </div>
@@ -57,12 +57,12 @@ export default function Home() {
               {/* Left Content */}
               <div className="text-left space-y-4 md:space-y-6">
                 <h2 className="text-3xl md:text-5xl lg:text-7xl font-bold text-[#e8dcc4] leading-tight tracking-wide">
-                  NEW
+                  NUOVI
                   <br />
-                  ARRIVALS
+                  ARRIVI
                 </h2>
                 <button className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 rounded">
-                  SHOP NOW
+                  ACQUISTA ORA
                 </button>
               </div>
 
@@ -72,7 +72,7 @@ export default function Home() {
                   <div className="text-center space-y-4">
                     <div className="text-5xl md:text-7xl">👓</div>
                     <p className="text-[#e8dcc4]/60 text-xs md:text-sm">
-                      Best Sellers Collection
+                      Collezione Best Seller
                     </p>
                   </div>
                 </div>
@@ -90,7 +90,7 @@ export default function Home() {
                 <div className="relative w-full h-[250px] md:h-[320px] bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 rounded-lg flex items-center justify-center border border-[#e8dcc4]/20">
                   <div className="text-center space-y-4">
                     <div className="text-5xl md:text-7xl">🕶️</div>
-                    <p className="text-[#e8dcc4]/60 text-xs md:text-sm">Sale Collection</p>
+                    <p className="text-[#e8dcc4]/60 text-xs md:text-sm">Collezione Saldi</p>
                   </div>
                 </div>
               </div>
@@ -102,12 +102,12 @@ export default function Home() {
                     50% OFF
                   </h2>
                   <p className="text-xl md:text-2xl lg:text-3xl text-[#e8dcc4] mt-2 md:mt-4 tracking-wider">
-                    SELECTED ITEMS
+                    ARTICOLI SELEZIONATI
                   </p>
                 </div>
                 <div className="flex md:justify-end">
                   <button className="border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-semibold tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 rounded">
-                    SHOP SALE
+                    ACQUISTA SALDI
                   </button>
                 </div>
               </div>
@@ -129,13 +129,13 @@ export default function Home() {
               href="#privacy"
               className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide"
             >
-              PRIVACY POLICY
+              PRIVACY
             </a>
             <a
               href="#terms"
               className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide"
             >
-              TERMS OF SERVICE
+              TERMINI DI SERVIZIO
             </a>
           </nav>
         </div>

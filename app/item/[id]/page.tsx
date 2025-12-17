@@ -60,7 +60,7 @@ export default function ItemPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#2d1810] flex items-center justify-center">
-        <p className="text-[#e8dcc4] text-xl">Loading...</p>
+        <p className="text-[#e8dcc4] text-xl">Caricamento...</p>
       </div>
     );
   }
@@ -186,7 +186,7 @@ export default function ItemPage() {
           </div>
           <nav className="flex gap-3 md:gap-6">
             <Link href={item.category === 'sale' ? '/new-sale' : '/best-sellers'} className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-xs md:text-sm lg:text-base">
-              ← BACK
+              ← INDIETRO
             </Link>
             <Link href="/" className="text-[#e8dcc4] hover:text-white transition-colors font-medium tracking-wide text-xs md:text-sm lg:text-base">
               HOME
@@ -322,7 +322,7 @@ export default function ItemPage() {
                       ${item.price}
                     </span>
                     <span className="text-base md:text-lg lg:text-xl text-[#e8dcc4]/70 tracking-wide">
-                      Save ${(item.originalPrice - item.price).toFixed(2)}
+                      Risparmia ${(item.originalPrice - item.price).toFixed(2)}
                     </span>
                   </div>
                 ) : (
@@ -336,7 +336,7 @@ export default function ItemPage() {
             {/* Description Section */}
             <div className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg p-4 md:p-6 lg:p-8 border border-[#e8dcc4]/10">
               <h2 className="text-xl md:text-2xl font-bold text-[#e8dcc4] mb-3 md:mb-4 tracking-wide">
-                Description
+                Descrizione
               </h2>
               <p className="text-[#e8dcc4]/80 text-sm md:text-base lg:text-lg leading-relaxed whitespace-pre-wrap">
                 {item.description}
@@ -345,7 +345,7 @@ export default function ItemPage() {
 
             {/* Action Button */}
             <button className="w-full border-2 border-[#e8dcc4] text-[#e8dcc4] px-6 py-3 md:px-8 md:py-4 rounded-lg font-bold text-base md:text-lg lg:text-xl tracking-wider hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 shadow-lg">
-              ADD TO CART
+              AGGIUNGI AL CARRELLO
             </button>
           </div>
         </div>
@@ -361,10 +361,10 @@ export default function ItemPage() {
           </div>
           <nav className="flex flex-wrap gap-4 md:gap-6 lg:gap-8 justify-center">
             <a href="#privacy" className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide">
-              PRIVACY POLICY
+              PRIVACY
             </a>
             <a href="#terms" className="text-[#e8dcc4] hover:text-white transition-colors text-xs md:text-sm tracking-wide">
-              TERMS OF SERVICE
+              TERMINI DI SERVIZIO
             </a>
           </nav>
         </div>

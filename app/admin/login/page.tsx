@@ -27,10 +27,10 @@ export default function AdminLogin() {
         router.push('/admin');
         router.refresh();
       } else {
-        setError('Invalid username or password');
+        setError('Nome utente o password non validi');
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      setError('Login fallito. Riprova.');
     } finally {
       setLoading(false);
     }
@@ -54,17 +54,17 @@ export default function AdminLogin() {
         <div className="bg-gradient-to-br from-[#1a1310]/90 to-[#2d1810]/90 backdrop-blur-sm rounded-lg shadow-2xl p-6 md:p-8 border border-[#e8dcc4]/20">
           <div className="text-center mb-6 md:mb-8">
             <h1 className="text-2xl md:text-3xl font-bold text-[#e8dcc4] mb-2 tracking-wide">
-              ADMIN LOGIN
+              LOGIN AMMINISTRATORE
             </h1>
             <p className="text-[#e8dcc4]/70 text-sm md:text-base">
-              Enter your credentials to access the admin panel
+              Inserisci le tue credenziali per accedere al pannello di amministrazione
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             <div>
               <label htmlFor="username" className="block text-xs md:text-sm font-medium text-[#e8dcc4] mb-2 tracking-wide">
-                USERNAME
+                NOME UTENTE
               </label>
               <input
                 id="username"
@@ -73,7 +73,7 @@ export default function AdminLogin() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
-                placeholder="Enter username"
+                placeholder="Inserisci nome utente"
               />
             </div>
 
@@ -88,7 +88,7 @@ export default function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-[#e8dcc4]/30 rounded bg-[#1a1310]/50 text-[#e8dcc4] focus:ring-2 focus:ring-[#e8dcc4] focus:border-[#e8dcc4] transition-all placeholder-[#e8dcc4]/40"
-                placeholder="Enter password"
+                placeholder="Inserisci password"
               />
             </div>
 
@@ -103,19 +103,19 @@ export default function AdminLogin() {
               disabled={loading}
               className="w-full border-2 border-[#e8dcc4] text-[#e8dcc4] font-semibold py-2 md:py-3 px-4 rounded tracking-wider text-sm md:text-base hover:bg-[#e8dcc4] hover:text-[#2d1810] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'LOGGING IN...' : 'LOGIN'}
+              {loading ? 'ACCESSO IN CORSO...' : 'ACCEDI'}
             </button>
           </form>
 
           <div className="mt-4 md:mt-6 text-center">
             <Link href="/" className="text-[#e8dcc4] hover:text-white transition-colors tracking-wide text-sm md:text-base">
-              ← BACK TO HOME
+              ← TORNA ALLA HOME
             </Link>
           </div>
 
           <div className="mt-4 md:mt-6 p-3 md:p-4 bg-[#1a1310]/50 rounded border border-[#e8dcc4]/10">
             <p className="text-xs text-[#e8dcc4]/60 text-center">
-              Default credentials: admin / admin123
+              Credenziali predefinite: admin / admin123
             </p>
           </div>
         </div>
