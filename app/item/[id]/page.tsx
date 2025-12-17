@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Item {
   id: string;
@@ -27,6 +27,7 @@ export default function ItemPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Minimum swipe distance (in px) to trigger navigation
   const minSwipeDistance = 50;
@@ -119,20 +120,28 @@ export default function ItemPage() {
     setIsDragging(false);
 
     if (isLeftSwipe) {
-      // Complete the transition to next image
+      // Animate to complete position (show next image fully)
       setIsTransitioning(true);
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      const containerWidth = containerRef.current?.offsetWidth || window.innerWidth;
+      setDragOffset(-containerWidth); // Slide to show next image
+
       setTimeout(() => {
-        setIsTransitioning(false);
+        // After animation, change index and reset position
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
         setDragOffset(0);
+        setIsTransitioning(false);
       }, 300);
     } else if (isRightSwipe) {
-      // Complete the transition to previous image
+      // Animate to complete position (show previous image fully)
       setIsTransitioning(true);
-      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+      const containerWidth = containerRef.current?.offsetWidth || window.innerWidth;
+      setDragOffset(containerWidth); // Slide to show previous image
+
       setTimeout(() => {
-        setIsTransitioning(false);
+        // After animation, change index and reset position
+        setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
         setDragOffset(0);
+        setIsTransitioning(false);
       }, 300);
     } else {
       // Snap back to current position
@@ -185,6 +194,7 @@ export default function ItemPage() {
           <div className="space-y-4">
             <div className="relative bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-[#e8dcc4]/10 shadow-2xl">
               <div
+                ref={containerRef}
                 className="aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 relative overflow-hidden"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
