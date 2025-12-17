@@ -121,27 +121,35 @@ export default function ItemPage() {
 
     if (isLeftSwipe) {
       // Animate to complete position (show next image fully)
-      setIsTransitioning(true);
       const containerWidth = containerRef.current?.offsetWidth || window.innerWidth;
       setDragOffset(-containerWidth); // Slide to show next image
 
       setTimeout(() => {
-        // After animation, change index and reset position
+        // After animation completes, instantly (no transition) reset to new position
+        setIsTransitioning(true); // This disables transition
         setCurrentImageIndex((prev) => (prev + 1) % images.length);
         setDragOffset(0);
-        setIsTransitioning(false);
+
+        // Re-enable transitions on next frame
+        requestAnimationFrame(() => {
+          setIsTransitioning(false);
+        });
       }, 300);
     } else if (isRightSwipe) {
       // Animate to complete position (show previous image fully)
-      setIsTransitioning(true);
       const containerWidth = containerRef.current?.offsetWidth || window.innerWidth;
       setDragOffset(containerWidth); // Slide to show previous image
 
       setTimeout(() => {
-        // After animation, change index and reset position
+        // After animation completes, instantly (no transition) reset to new position
+        setIsTransitioning(true); // This disables transition
         setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
         setDragOffset(0);
-        setIsTransitioning(false);
+
+        // Re-enable transitions on next frame
+        requestAnimationFrame(() => {
+          setIsTransitioning(false);
+        });
       }, 300);
     } else {
       // Snap back to current position
@@ -205,7 +213,7 @@ export default function ItemPage() {
                   className="absolute inset-0 flex"
                   style={{
                     transform: `translateX(calc(-100% + ${dragOffset}px))`,
-                    transition: isDragging ? 'none' : 'transform 0.3s ease-out',
+                    transition: (isDragging || isTransitioning) ? 'none' : 'transform 0.3s ease-out',
                   }}
                 >
                   {/* Previous Image */}
