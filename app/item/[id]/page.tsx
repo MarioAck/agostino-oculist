@@ -22,6 +22,11 @@ export default function ItemPage() {
   const [item, setItem] = useState<Item | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px) to trigger navigation
+  const minSwipeDistance = 50;
 
   useEffect(() => {
     async function fetchItem() {
@@ -71,6 +76,29 @@ export default function ItemPage() {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      nextImage();
+    } else if (isRightSwipe) {
+      prevImage();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#2d1810] relative overflow-hidden flex flex-col">
       {/* Textured Background Overlay */}
@@ -112,7 +140,12 @@ export default function ItemPage() {
           {/* Left Side - Image Gallery */}
           <div className="space-y-4">
             <div className="relative bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg overflow-hidden border border-[#e8dcc4]/10 shadow-2xl">
-              <div className="aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 flex items-center justify-center relative">
+              <div
+                className="aspect-square bg-gradient-to-br from-[#3d2820]/50 to-[#1a1310]/50 flex items-center justify-center relative"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+              >
                 <img
                   src={images[currentImageIndex]}
                   alt={`${item.name} - Image ${currentImageIndex + 1}`}
