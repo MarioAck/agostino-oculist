@@ -298,6 +298,25 @@ export default function AdminPage() {
     setShowDeleteModal(true);
   };
 
+  const handleMoveItem = async (id: string, direction: 'up' | 'down', category: string) => {
+    try {
+      const response = await fetch("/api/items", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, direction, category }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reorder item');
+      }
+
+      fetchItems();
+    } catch (error) {
+      console.error("Failed to reorder item:", error);
+      alert("Impossibile riordinare l'articolo. Riprova.");
+    }
+  };
+
   const confirmDelete = async () => {
     if (!itemToDelete) return;
 
@@ -679,7 +698,7 @@ export default function AdminPage() {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-            {bestSellers.map((item) => (
+            {bestSellers.map((item, index) => (
               <div
                 key={item.id}
                 className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-[#e8dcc4]/10"
@@ -690,6 +709,31 @@ export default function AdminPage() {
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />
+                  {/* Reorder buttons */}
+                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    {index > 0 && (
+                      <button
+                        onClick={() => handleMoveItem(item.id, 'up', 'best-seller')}
+                        className="bg-[#e8dcc4]/90 hover:bg-[#e8dcc4] text-[#2d1810] p-1.5 rounded transition-all shadow-lg"
+                        title="Sposta su"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                      </button>
+                    )}
+                    {index < bestSellers.length - 1 && (
+                      <button
+                        onClick={() => handleMoveItem(item.id, 'down', 'best-seller')}
+                        className="bg-[#e8dcc4]/90 hover:bg-[#e8dcc4] text-[#2d1810] p-1.5 rounded transition-all shadow-lg"
+                        title="Sposta giù"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                   {item.images && item.images.length > 1 && (
                     <div className="absolute bottom-2 right-2 bg-[#e8dcc4]/90 text-[#2d1810] px-2 py-1 rounded text-xs font-bold">
                       +{item.images.length - 1} altre
@@ -759,7 +803,7 @@ export default function AdminPage() {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-            {saleItems.map((item) => (
+            {saleItems.map((item, index) => (
               <div
                 key={item.id}
                 className="bg-gradient-to-br from-[#1a1310]/80 to-[#2d1810]/80 backdrop-blur-sm rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-[#e8dcc4]/10"
@@ -770,6 +814,31 @@ export default function AdminPage() {
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />
+                  {/* Reorder buttons */}
+                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    {index > 0 && (
+                      <button
+                        onClick={() => handleMoveItem(item.id, 'up', 'sale')}
+                        className="bg-[#e8dcc4]/90 hover:bg-[#e8dcc4] text-[#2d1810] p-1.5 rounded transition-all shadow-lg"
+                        title="Sposta su"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                        </svg>
+                      </button>
+                    )}
+                    {index < saleItems.length - 1 && (
+                      <button
+                        onClick={() => handleMoveItem(item.id, 'down', 'sale')}
+                        className="bg-[#e8dcc4]/90 hover:bg-[#e8dcc4] text-[#2d1810] p-1.5 rounded transition-all shadow-lg"
+                        title="Sposta giù"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                   <div className="absolute top-3 right-3 md:top-4 md:right-4 bg-[#e8dcc4] text-[#2d1810] px-2 md:px-3 py-1 rounded text-xs md:text-sm font-bold shadow-lg">
                     {item.discount}% OFF
                   </div>

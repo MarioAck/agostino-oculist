@@ -164,3 +164,41 @@ export async function DELETE(request: Request) {
     }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const { id, direction, category } = await request.json();
+
+    if (!id || !direction || !category) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const data = readItemsData();
+    const array = category === 'best-seller' ? data.bestSellers : data.saleItems;
+    const index = array.findIndex((item: any) => item.id === id);
+
+    if (index === -1) {
+      return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+    }
+
+    // Calculate new index
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+
+    // Check bounds
+    if (newIndex < 0 || newIndex >= array.length) {
+      return NextResponse.json({ error: 'Cannot move item beyond bounds' }, { status: 400 });
+    }
+
+    // Swap items
+    [array[index], array[newIndex]] = [array[newIndex], array[index]];
+
+    writeItemsData(data);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Failed to reorder item:', error);
+    return NextResponse.json({
+      error: 'Failed to reorder item',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
+  }
+}
