@@ -36,9 +36,13 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy cleanup script and entrypoint
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+
 # Create directories with read/write permissions for all users before switching to nextjs user
 RUN mkdir -p /app/data /app/public/uploads && \
-    chmod -R 777 /app/data /app/public/uploads
+    chmod -R 777 /app/data /app/public/uploads && \
+    chmod +x /app/scripts/docker-entrypoint.sh
 
 EXPOSE 3000
 
@@ -48,4 +52,4 @@ ENV HOSTNAME="0.0.0.0"
 # Switch to nextjs user
 USER nextjs
 
-CMD ["node", "server.js"]
+CMD ["/app/scripts/docker-entrypoint.sh"]
