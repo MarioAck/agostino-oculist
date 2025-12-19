@@ -98,13 +98,22 @@ export default function AdminPage() {
 
       // Only calculate for sale items
       if (prev.category === "sale") {
-        // If originalPrice and discount are set, calculate price only
+        // If originalPrice and discount are set, calculate price
         if (name === "originalPrice" && numValue > 0 && updated.discount != null && updated.discount !== 0) {
           setPriceError("");
           updated.price = Math.round(numValue * (1 - updated.discount / 100) * 100) / 100;
-        } else if (name === "discount" && numValue !== 0 && updated.originalPrice && updated.originalPrice > 0) {
+        }
+        // If discount is changed, calculate price
+        else if (name === "discount" && numValue !== 0 && updated.originalPrice && updated.originalPrice > 0) {
           setPriceError("");
           updated.price = Math.round(updated.originalPrice * (1 - numValue / 100) * 100) / 100;
+        }
+        // If price is changed directly, calculate discount percentage
+        else if (name === "price" && numValue > 0 && updated.originalPrice && updated.originalPrice > 0) {
+          setPriceError("");
+          // Calculate discount: (1 - price/originalPrice) * 100
+          const calculatedDiscount = Math.round((1 - numValue / updated.originalPrice) * 100);
+          updated.discount = calculatedDiscount >= 0 ? calculatedDiscount : 0;
         }
       }
 
