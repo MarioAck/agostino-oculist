@@ -28,6 +28,9 @@ npm start
 
 # Run linter
 npm run lint
+
+# Cleanup unused upload files
+npm run cleanup
 ```
 
 ## Docker Commands
@@ -68,7 +71,14 @@ docker-compose up -d --build
 
 ### API Routes Structure
 
-- `app/api/items/route.ts`: CRUD operations (GET, POST, PUT, DELETE) for eyewear items
+- `app/api/items/route.ts`: CRUD operations (GET, POST, PUT, DELETE, PATCH) for eyewear items
+  - GET: Fetches items with automatic normalization of image/images fields
+  - POST: Creates new item with auto-generated ID
+  - PUT: Updates existing item
+  - DELETE: Removes item by ID
+  - PATCH: Reorders items within category (up/down direction)
+- `app/api/upload/route.ts`: Image upload endpoint with Sharp optimization
+- `app/api/images/[filename]/route.ts`: Image serving with aggressive caching
 - `app/api/auth/login/route.ts`: Authentication endpoint that sets auth cookie
 - `app/api/auth/check/route.ts`: Validates authentication status
 - `app/api/auth/logout/route.ts`: Clears authentication cookie
@@ -78,13 +88,14 @@ docker-compose up -d --build
 - `/` (app/page.tsx): Homepage with navigation cards
 - `/best-sellers` (app/best-sellers/page.tsx): Server component displaying best sellers
 - `/new-sale` (app/new-sale/page.tsx): Server component displaying sale items
+- `/item/[id]` (app/item/[id]/page.tsx): Client component with image carousel and swipe support
 - `/admin/login` (app/admin/login/page.tsx): Admin login form
-- `/admin` (app/admin/page.tsx): Protected admin dashboard with item management
+- `/admin` (app/admin/page.tsx): Protected admin dashboard with item management and reordering
 
 ### Client vs Server Components
 
 - **Server Components**: Homepage, best-sellers page, new-sale page (fetch data server-side)
-- **Client Components**: Admin pages (marked with `'use client'` for state management and auth)
+- **Client Components**: Admin pages, item detail page (marked with `'use client'` for state management, auth, and carousel interactions)
 
 ### Data Fetching Patterns
 
@@ -100,12 +111,15 @@ interface Item {
   name: string;
   price: number;
   originalPrice?: number;  // Only for sale items
-  discount?: number;       // Only for sale items (percentage)
+  discount?: number;       // Only for sale items (percentage, auto-calculates price)
   description: string;
-  image: string;           // Emoji or URL
+  image: string;           // Single image URL (maintained for backward compatibility, always set to images[0])
+  images: string[];        // Array of image URLs, primary source of truth for multiple images
   category: 'best-seller' | 'sale';
 }
 ```
+
+**Note**: The GET endpoint automatically normalizes items to ensure both `image` and `images` fields exist, migrating old data transparently.
 
 ## Environment Variables
 
@@ -125,8 +139,11 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 - **Output mode**: Next.js standalone output (configured in `next.config.ts`)
 - **Port**: 3000 (mapped in docker-compose)
 - **User**: Runs as non-root user `nextjs` (uid 1001)
-- **Volumes**: Mounts `./data` to `/app/data` for persistence
+- **Volumes**:
+  - `data:/app/data` - Persists items.json across restarts
+  - `uploads:/app/public/uploads` - Persists uploaded images
 - **Network**: Custom bridge network `app-network`
+- **Entrypoint**: `docker-entrypoint.sh` runs cleanup script before starting server
 
 ## Key Implementation Details
 
@@ -143,12 +160,45 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 5. **Admin panel state**: Uses React state for form management, with optimistic UI updates after mutations
 
+6. **Image upload and optimization**: All uploaded images are processed with Sharp library:
+   - Resized to 2000x2000px with center crop positioning
+   - Converted to WebP format at 95% quality with compression effort level 6
+   - GIF files preserved as-is to maintain animations
+   - Unique filenames: `{timestamp}-{random}-{originalName}.webp`
+   - Images served via `/api/images/{filename}` with immutable caching (max-age=31536000)
+   - Maximum file size: 50MB per upload
+   - Supports multiple file uploads simultaneously
+
+7. **Multiple images per item**: Items support both single and multiple images:
+   - `images` array is the primary source (supports drag-to-reorder in admin)
+   - `image` field maintained for backward compatibility (always set to first image)
+   - Admin panel shows first image as "MAIN" with badge
+   - Item detail page features touch-enabled carousel with swipe gestures
+
+8. **Cleanup system**: Orphaned upload files are automatically removed:
+   - `scripts/cleanup-uploads.js` compares database references with actual files
+   - Runs automatically on Docker container startup via `docker-entrypoint.sh`
+   - Can be run manually with `npm run cleanup`
+   - Handles both `/uploads/` and `/api/images/` URL patterns
+   - Reports deleted files and space freed
+
+9. **Item reordering**: Admin panel supports drag-free reordering:
+   - Up/down arrow buttons on each item card
+   - PATCH endpoint swaps item positions within category
+   - Validates bounds to prevent invalid moves
+   - Works independently for best-sellers and sale items
+
+10. **Localization**: All UI text is in Italian throughout the application
+
 ## Common Development Patterns
 
 - **Adding new routes**: Create files in `app/` directory following App Router conventions
 - **Adding new API endpoints**: Create `route.ts` files in `app/api/` directory
 - **Modifying item structure**: Update both the TypeScript interface and the JSON file structure
 - **Styling**: Use Tailwind utility classes, dark mode variants available with `dark:` prefix
+- **Adding images to items**: Images upload immediately on file selection (not on form submit), returns array of URLs
+- **Price calculations**: Sale items auto-calculate price from originalPrice and discount percentage
+- **Carousel implementation**: Uses touch events with `touchStart`, `touchEnd`, drag offset, and transition states
 
 ## Deployment Notes
 
@@ -156,3 +206,5 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 - NOT compatible with serverless platforms (Vercel, Netlify) due to file system writes
 - For serverless deployment, you would need to replace file-based storage with a database
 - The standalone output mode produces a self-contained deployment in `.next/standalone/`
+- Container startup runs cleanup script automatically to remove orphaned uploads
+- Both data and uploads directories have 777 permissions for read/write access
